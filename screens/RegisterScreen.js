@@ -61,7 +61,8 @@ const RegisterScreen = navData => {
               console.log(response);
 
               if (response.success == 'true') {
-                navData.navigation.navigate('Home');
+                alert(response.Message);
+                navData.navigation.navigate('Login');
               } else {
                 alert(response.Message);
               }

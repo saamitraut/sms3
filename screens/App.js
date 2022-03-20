@@ -15,6 +15,7 @@ class App extends Component {
   constructor(props) {
     super(props);
 
+    console.log(props);
     this.state = {
       calls: [],
       isAddEmployeeModalOpen: false,
@@ -28,6 +29,7 @@ class App extends Component {
   }
   componentDidMount() {
     this.getEngineerId();
+    // this.props.navigation.navigate('About');
   }
   //
   getEngineerId = () => {
@@ -67,13 +69,13 @@ class App extends Component {
         }),
       );
   };
-  // logout = props => {
-  //   AsyncStorage.removeItem('token')
-  //     .then(() => {
-  //       props.navigation.replace('Login');
-  //     })
-  //     .catch(err => console.log(err));
-  // };
+  logout = () => {
+    AsyncStorage.removeItem('token')
+      .then(() => {
+        this.props.navigation.navigate('Login');
+      })
+      .catch(err => console.log(err));
+  };
 
   toggleAddEmployeeModal = () => {
     this.setState({isAddEmployeeModalOpen: !this.state.isAddEmployeeModalOpen});
@@ -124,10 +126,14 @@ class App extends Component {
     return (
       <ScrollView>
         <View style={styles.container}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={this.toggleAddEmployeeModal}
             style={styles.button}>
             <Text style={styles.buttonText}>Add Call</Text>
+          </TouchableOpacity> */}
+
+          <TouchableOpacity onPress={this.logout} style={styles.button}>
+            <Text style={styles.buttonText}>Logout</Text>
           </TouchableOpacity>
           <Text style={styles.title}>Call Lists:</Text>
           {this.state.calls.map((call, index) => (

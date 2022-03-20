@@ -7,6 +7,7 @@ const Stack = createStackNavigator();
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import HomeScreen from '../screens/App';
+import About from '../screens/About';
 // import HomeScreen from '../screens/HomeScreen';
 function AppNavigator() {
   return (
@@ -26,6 +27,11 @@ function AppNavigator() {
           name="Home"
           component={HomeScreen}
           options={{headerLeft: null}}
+        />
+        <Stack.Screen
+          name="About"
+          component={About}
+          options={{headerShown: true}}
         />
       </Stack.Navigator>
     </NavigationContainer>
