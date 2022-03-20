@@ -25,6 +25,7 @@ class App extends Component {
       errorMessage: '',
       selectedEmployee: {},
       engineerid: 0,
+      status: 0,
     };
   }
   componentDidMount() {
@@ -44,7 +45,7 @@ class App extends Component {
     // alert(this.state.engineerid);
     var data = new FormData();
     data.append('EngineerId', engineerid);
-    data.append('status', 0);
+    data.append('status', this.state.status);
 
     const InsertAPIURL = 'http://103.219.0.103/sla/getCallDetails.php';
 
@@ -114,6 +115,7 @@ class App extends Component {
     });
   };
   render() {
+    // alert('hello');
     const {
       loading,
       errorMessage,
@@ -131,10 +133,28 @@ class App extends Component {
             style={styles.button}>
             <Text style={styles.buttonText}>Add Call</Text>
           </TouchableOpacity> */}
-
           <TouchableOpacity onPress={this.logout} style={styles.button}>
             <Text style={styles.buttonText}>Logout</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              this.setState({status: 1});
+              this.getEngineerId();
+            }}
+            style={styles.button}>
+            <Text style={styles.buttonText}>Open Calls</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              this.setState({status: 0});
+              this.getEngineerId();
+            }}
+            style={styles.button}>
+            <Text style={styles.buttonText}>Closed Calls</Text>
+          </TouchableOpacity>
+          <Text style={styles.title2}>
+            {this.state.status ? 'Open calls' : 'Closed calls'}
+          </Text>
           <Text style={styles.title}>Call Lists:</Text>
           {this.state.calls.map((call, index) => (
             <View style={styles.employeeListContainer} key={call.CallLogId}>
@@ -198,6 +218,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 20,
     marginBottom: 10,
+  },
+  title2: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    marginBottom: 5,
+    color: '#000000',
   },
   employeeListContainer: {
     marginBottom: 25,
