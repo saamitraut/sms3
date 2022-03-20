@@ -133,28 +133,38 @@ class App extends Component {
             style={styles.button}>
             <Text style={styles.buttonText}>Add Call</Text>
           </TouchableOpacity> */}
-          <TouchableOpacity onPress={this.logout} style={styles.button}>
-            <Text style={styles.buttonText}>Logout</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              this.setState({status: 1});
-              this.getEngineerId();
-            }}
-            style={styles.button}>
-            <Text style={styles.buttonText}>Open Calls</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              this.setState({status: 0});
-              this.getEngineerId();
-            }}
-            style={styles.button}>
-            <Text style={styles.buttonText}>Closed Calls</Text>
-          </TouchableOpacity>
+          <View
+            style={[
+              styles.container,
+              {
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              },
+            ]}>
+            <TouchableOpacity
+              onPress={() => {
+                this.setState({status: 1});
+                this.getEngineerId();
+              }}
+              style={[styles.button, {flex: 1, marginHorizontal: 5}]}>
+              <Text style={[styles.buttonText]}>Open Calls</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                this.setState({status: 0});
+                this.getEngineerId();
+              }}
+              style={[styles.button, , {flex: 1, marginHorizontal: 5}]}>
+              <Text style={[styles.buttonText]}>Closed Calls</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={this.logout} style={styles.button}>
+              <Text style={styles.buttonText}>Logout</Text>
+            </TouchableOpacity>
+          </View>
           <Text style={styles.title2}>
             {this.state.status ? 'Open calls' : 'Closed calls'}
           </Text>
+
           <Text style={styles.title}>Call Lists:</Text>
           {this.state.calls.map((call, index) => (
             <View style={styles.employeeListContainer} key={call.CallLogId}>
@@ -201,6 +211,7 @@ export default App;
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
+    flex: 1,
   },
   button: {
     borderRadius: 5,

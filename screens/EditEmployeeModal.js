@@ -150,40 +150,65 @@ class EditEmployeeModal extends Component {
         animationType="slide">
         <ScrollView>
           <View style={styles.container}>
-            <Text style={styles.title}>Update Employee</Text>
-            <Text style={styles.title2}>Call Id:</Text>
-            <Text style={styles.title3}>{CallLogId}</Text>
-            {/* <TextInput
+            <Text style={styles.title}>Update Call</Text>
+            <View style={styles.row}>
+              <View>
+                <Text style={styles.title2}>Call Id:</Text>
+                <Text style={styles.title3}>{CallLogId}</Text>
+              </View>
+              {/* <TextInput
               value={CallLogId}
               style={styles.textBox}
               onChangeText={text => this.handleChange(text, 'CallLogId')}
               placeholder="CallLogId"
             /> */}
-            <Text style={styles.title2}>CallType:</Text>
-            <Text style={styles.title3}>
-              {CalltypeId == 2 ? 'Complaint' : ''}
-            </Text>
+              <View>
+                <Text style={styles.title2}>CallType:</Text>
+                <Text style={styles.title3}>
+                  {CalltypeId == 2 ? 'Complaint' : ''}
+                </Text>
+              </View>
 
-            <Text style={styles.title2}>CustomerId:</Text>
-            <Text style={styles.title3}>{CustomerId}</Text>
+              <View>
+                <Text style={styles.title2}>CustomerId:</Text>
+                <Text style={styles.title3}>{CustomerId}</Text>
+              </View>
+            </View>
 
-            <Text style={styles.title2}>Description:</Text>
-            <Text style={styles.title3}>{Description}</Text>
+            <View style={styles.row}>
+              <View>
+                <Text style={styles.title2}>Engineer:</Text>
+                <Text style={styles.title3}>{Engineer}</Text>
+              </View>
+              <View>
+                <Text style={styles.title2}>Description:</Text>
+                <Text style={styles.title3}>{Description}</Text>
+              </View>
+            </View>
 
-            <Text style={styles.title2}>Engineer:</Text>
-            <Text style={styles.title3}>{Engineer}</Text>
+            <View style={styles.row}>
+              <View>
+                <Text style={styles.title2}>SubCallType:</Text>
+                <Text style={styles.title3}>{SubCallType}</Text>
+              </View>
 
-            <Text style={styles.title2}>SubCallType:</Text>
-            <Text style={styles.title3}>{SubCallType}</Text>
+              <View>
+                <Text style={styles.title2}>SubscriberName:</Text>
+                <Text style={styles.title3}>{SubscriberName}</Text>
+              </View>
+            </View>
 
-            <Text style={styles.title2}>SubscriberName:</Text>
-            <Text style={styles.title3}>{SubscriberName}</Text>
+            <View style={styles.row}>
+              <View>
+                <Text style={styles.title2}>ComplaintId</Text>
+                <Text style={styles.title3}>{complaintid}</Text>
+              </View>
 
-            <Text style={styles.title2}>ComplaintId</Text>
-            <Text style={styles.title3}>{complaintid}</Text>
-
-            <Text style={styles.title2}>SubscriberId:</Text>
-            <Text style={styles.title3}>{subscriberid}</Text>
+              <View>
+                <Text style={styles.title2}>SubscriberId:</Text>
+                <Text style={styles.title3}>{subscriberid}</Text>
+              </View>
+            </View>
 
             <Text style={styles.title2}>Address:</Text>
             <Text style={styles.title3}>{address}</Text>
@@ -213,8 +238,10 @@ class EditEmployeeModal extends Component {
                   ...styles.button,
                   marginVertical: 0,
                   backgroundColor: '#034f84',
-                }}>
-                <Text style={styles.buttonText}>ON</Text>
+                }}
+                //
+                onPress={() => this.setState({status: 0})}>
+                <Text style={styles.buttonText}>OPEN</Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
@@ -222,8 +249,9 @@ class EditEmployeeModal extends Component {
                   ...styles.button,
                   marginVertical: 0,
                   backgroundColor: '#d64161',
-                }}>
-                <Text style={styles.buttonText}>OFF</Text>
+                }}
+                onPress={() => this.setState({status: 1})}>
+                <Text style={styles.buttonText}>CLOSED</Text>
               </TouchableOpacity>
             )}
             {loading ? (
@@ -263,6 +291,11 @@ export default EditEmployeeModal;
 const styles = StyleSheet.create({
   container: {
     padding: 15,
+    flex: 1,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   title: {
     fontWeight: 'bold',
