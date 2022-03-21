@@ -184,7 +184,7 @@ class App extends Component {
                 //
                 this.getEngineerId();
               }}
-              placeholder="Search SubscriberName"
+              placeholder="SubscriberName"
             />
           </View>
           <Text style={styles.title2}>
