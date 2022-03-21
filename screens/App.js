@@ -14,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class App extends Component {
   constructor(props) {
+    //
     super(props);
 
     console.log(props);
@@ -27,11 +28,12 @@ class App extends Component {
       selectedEmployee: {},
       engineerid: 0,
       status: 0,
+      SubscriberName: '',
     };
   }
   componentDidMount() {
-    this.getEngineerId();
     // this.props.navigation.navigate('About');
+    this.getEngineerId();
   }
   //
   getEngineerId = () => {
@@ -39,15 +41,15 @@ class App extends Component {
       .then(res => JSON.parse(res))
       .then(data => this.getData(data.engineerId));
   };
-
   //
-
   getData = engineerid => {
     this.setState({errorMessage: '', loading: true});
     var data = new FormData();
+
     data.append('EngineerId', engineerid);
     data.append('status', this.state.status);
     data.append('CallLogId', this.state.CallLogId);
+    data.append('SubscriberName', this.state.SubscriberName);
 
     const InsertAPIURL = 'http://103.219.0.103/sla/getCallDetails.php';
 
@@ -163,16 +165,28 @@ class App extends Component {
               <Text style={styles.buttonText}>Logout</Text>
             </TouchableOpacity>
           </View>
-          <TextInput
-            defaultValue={''}
-            style={styles.textBox}
-            onChangeText={text => {
-              this.setState({CallLogId: text});
-              //
-              this.getEngineerId();
-            }}
-            placeholder="Search CallLogId"
-          />
+          <View style={styles.row}>
+            <TextInput
+              defaultValue={''}
+              style={styles.textBox}
+              onChangeText={text => {
+                this.setState({CallLogId: text});
+                //
+                this.getEngineerId();
+              }}
+              placeholder="Search CallLogId"
+            />
+            <TextInput
+              defaultValue={''}
+              style={styles.textBox}
+              onChangeText={text => {
+                this.setState({SubscriberName: text});
+                //
+                this.getEngineerId();
+              }}
+              placeholder="Search SubscriberName"
+            />
+          </View>
           <Text style={styles.title2}>
             {this.state.status ? 'Open calls' : 'Closed calls'}
           </Text>
@@ -279,6 +293,8 @@ const styles = StyleSheet.create({
   },
   message: {
     color: 'tomato',
-    fontSize: 17,
+    fontSize: 19,
   },
+  //
+  row: {flex: 1, flexDirection: 'row', justifyContent: 'space-between'},
 });
