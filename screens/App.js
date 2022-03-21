@@ -3,6 +3,7 @@ import {
   ScrollView,
   View,
   Text,
+  TextInput,
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
@@ -38,14 +39,15 @@ class App extends Component {
       .then(res => JSON.parse(res))
       .then(data => this.getData(data.engineerId));
   };
+
   //
 
   getData = engineerid => {
     this.setState({errorMessage: '', loading: true});
-    // alert(this.state.engineerid);
     var data = new FormData();
     data.append('EngineerId', engineerid);
     data.append('status', this.state.status);
+    data.append('CallLogId', this.state.CallLogId);
 
     const InsertAPIURL = 'http://103.219.0.103/sla/getCallDetails.php';
 
@@ -161,45 +163,63 @@ class App extends Component {
               <Text style={styles.buttonText}>Logout</Text>
             </TouchableOpacity>
           </View>
+          <TextInput
+            defaultValue={''}
+            style={styles.textBox}
+            onChangeText={text => {
+              this.setState({CallLogId: text});
+              //
+              this.getEngineerId();
+            }}
+            placeholder="Search CallLogId"
+          />
           <Text style={styles.title2}>
             {this.state.status ? 'Open calls' : 'Closed calls'}
           </Text>
-
-          <Text style={styles.title}>Call Lists:</Text>
-          {this.state.calls.map((call, index) => (
-            <View style={styles.employeeListContainer} key={call.CallLogId}>
-              <Text style={{...styles.listItem, color: 'tomato'}}>
-                {index + 1}.
-              </Text>
-              <Text style={styles.name}>{call.SubscriberName}</Text>
-              <Text style={styles.listItem}>CallLogId: {call.CallLogId}</Text>
-              <Text style={styles.listItem}>
-                Last Reply: {call.ClosedReply}
-              </Text>
-              <Text style={styles.listItem}>
-                Description: {call.Description}
-              </Text>
-              <Text style={styles.listItem}>Address: {call.address} </Text>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  onPress={() => {
-                    this.toggleEditEmployeeModal();
-                    this.setState({selectedEmployee: call});
-                  }}
-                  style={{...styles.button, marginVertical: 0}}>
-                  <Text style={styles.buttonText}>Edit</Text>
-                </TouchableOpacity>
-              </View>
+          {this.state.calls != undefined ? (
+            <View>
+              <Text>Total Calls {this.state.calls.length}</Text>
+              <Text style={styles.title}>Call Lists:</Text>
+              {this.state.calls.map((call, index) => (
+                <View style={styles.employeeListContainer} key={call.CallLogId}>
+                  <Text style={{...styles.listItem, color: 'tomato'}}>
+                    {index + 1}.
+                  </Text>
+                  <Text style={styles.name}>{call.SubscriberName}</Text>
+                  <Text style={styles.listItem}>
+                    CallLogId: {call.CallLogId}
+                  </Text>
+                  <Text style={styles.listItem}>
+                    Last Reply: {call.ClosedReply}
+                  </Text>
+                  <Text style={styles.listItem}>
+                    Description: {call.Description}
+                  </Text>
+                  <Text style={styles.listItem}>Address: {call.address} </Text>
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        this.toggleEditEmployeeModal();
+                        this.setState({selectedEmployee: call});
+                      }}
+                      style={{...styles.button, marginVertical: 0}}>
+                      <Text style={styles.buttonText}>Edit</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+              {isEditEmployeeModalOpen ? (
+                <EditEmployeeModal
+                  isOpen={isEditEmployeeModalOpen}
+                  closeModal={this.toggleEditEmployeeModal}
+                  selectedEmployee={selectedEmployee}
+                  updateEmployee={this.updateEmployee}
+                />
+              ) : null}
             </View>
-          ))}
-          {isEditEmployeeModalOpen ? (
-            <EditEmployeeModal
-              isOpen={isEditEmployeeModalOpen}
-              closeModal={this.toggleEditEmployeeModal}
-              selectedEmployee={selectedEmployee}
-              updateEmployee={this.updateEmployee}
-            />
-          ) : null}
+          ) : (
+            <Text>No calls</Text>
+          )}
         </View>
       </ScrollView>
     );
