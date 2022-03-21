@@ -168,22 +168,20 @@ class EditEmployeeModal extends Component {
                   {CalltypeId == 2 ? 'Complaint' : ''}
                 </Text>
               </View>
-
+            </View>
+            <View style={styles.row}>
               <View>
                 <Text style={styles.title2}>CustomerId:</Text>
                 <Text style={styles.title3}>{CustomerId}</Text>
               </View>
-            </View>
-
-            <View style={styles.row}>
               <View>
                 <Text style={styles.title2}>Engineer:</Text>
                 <Text style={styles.title3}>{Engineer}</Text>
               </View>
-              <View>
-                <Text style={styles.title2}>Description:</Text>
-                <Text style={styles.title3}>{Description}</Text>
-              </View>
+            </View>
+            <View>
+              <Text style={styles.title2}>Description:</Text>
+              <Text style={styles.title3}>{Description}</Text>
             </View>
 
             <View style={styles.row}>
@@ -285,12 +283,11 @@ class EditEmployeeModal extends Component {
     );
   }
 }
-
 export default EditEmployeeModal;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 15,
+    padding: 20,
     flex: 1,
   },
   row: {

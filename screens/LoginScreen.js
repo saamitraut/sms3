@@ -49,7 +49,7 @@ const LoginScreen = navData => {
       style={{flex: 1}}>
       <Formik
         initialValues={{
-          email: 'pappu@gmail.com',
+          email: 'raju@gmail.com',
           password: 'password',
         }}
         validationSchema={formSchema}
