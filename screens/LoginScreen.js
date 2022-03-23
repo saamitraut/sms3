@@ -77,7 +77,7 @@ const LoginScreen = navData => {
                 'result received after hitting login api in LoginScreen on line 77',
               );
               console.log(result);
-              // return;
+
               if (result.success) {
                 try {
                   await AsyncStorage.setItem(
