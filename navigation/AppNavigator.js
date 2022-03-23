@@ -6,7 +6,7 @@ const Stack = createStackNavigator();
 
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
-import HomeScreen from '../screens/App';
+import HomeScreen from '../screens/Appl';
 import About from '../screens/About';
 // import HomeScreen from '../screens/HomeScreen';
 function AppNavigator() {
