@@ -31,11 +31,11 @@ const LoginScreen = navData => {
 
   const loadProfile = async () => {
     const token = await AsyncStorage.getItem('token');
-    // alert(token);
+    // console.log('token on loginscreen line 34');console.log(token);
 
     if (token != null) {
       // alert(token);
-      navData.navigation.navigate('Home');
+      navData.navigation.navigate('Home', {loggedinDetails: JSON.parse(token)});
     }
   };
   //
@@ -73,10 +73,10 @@ const LoginScreen = navData => {
           })
             .then(response => response.json())
             .then(async result => {
-              console.log(
-                'result received after hitting login api in LoginScreen on line 77',
-              );
-              console.log(result);
+              // console.log(
+              //   'result received after hitting login api in LoginScreen on line 77',
+              // );
+              // console.log(result);
 
               if (result.success) {
                 try {
@@ -85,7 +85,7 @@ const LoginScreen = navData => {
                     JSON.stringify(result.loggedinDetails),
                   );
                   navData.navigation.navigate('Home', {
-                    loggedinDetails: JSON.stringify(result.loggedinDetails),
+                    loggedinDetails: result.loggedinDetails,
                   });
                 } catch (err) {
                   console.log(err);

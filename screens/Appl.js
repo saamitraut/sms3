@@ -16,12 +16,14 @@ import Geolocation from '@react-native-community/geolocation';
 import {PermissionsAndroid} from 'react-native';
 //
 import DeviceInfo from 'react-native-device-info';
+import {json} from 'stream/consumers';
 
 class App extends Component {
   constructor(props) {
     super(props);
+    // console.log('props on line 25 appl.js');
+    // console.log(props.route.params.loggedinDetails);
 
-    // console.log(props);
     this.state = {
       calls: [],
       isAddEmployeeModalOpen: false,
@@ -30,7 +32,7 @@ class App extends Component {
       loading: false,
       errorMessage: '',
       selectedEmployee: {},
-      engineerid: 0,
+      // engineerid: 0,
       status: 0,
       SubscriberName: '',
       deviceId: '',
@@ -93,14 +95,15 @@ class App extends Component {
           JSON.stringify(position.coords.longitude),
         );
         // return;
+
         data.append(
           'currentLatitude',
           JSON.stringify(position.coords.latitude),
         );
         data.append('deviceid', DeviceInfo.getUniqueId());
         data.append('engineerId', engineerId);
-        console.log('line 99 appl.js');
-        console.log(data);
+        // console.log('line 99 appl.js');
+        // console.log(data);
 
         var xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
@@ -127,16 +130,75 @@ class App extends Component {
   //
 
   componentDidMount() {
+    // console.log('props on line 163 appl.js');
+    // console.log(this.props.route.params.loggedinDetails);
+    // return;
+    //    RECEIVING LOGGEDINDETAILS AS PROPS AND SAVING THEM AS CONSTANTS
+    const {email, engineerId, fullName} =
+      this.props.route.params.loggedinDetails;
+
+    // console.log(
+    //   'RECEIVING LOGGEDINDETAILS AS PROPS AND SAVING THEM AS CONSTANTS componentDidMount 163 Appl.js ',
+    // );
+    // console.log('email is ' + email);
+    // console.log('engineerId is ' + engineerId);
+    // console.log('fullName is ' + fullName);
+    // return;
     // this.props.navigation.navigate('About');
+
+    this.setState({email: email, engineerId: engineerId, fullName: fullName});
+
     this.requestLocationPermission();
-    this.getOneTimeLocationAsync();
-    this.getEngineerId();
+
+    this.getOneTimeLocation(engineerId);
+
+    this.getData(engineerId);
+
+    // this.watchID = this.getWatchId(engineerId);
   }
   //
+  getWatchId = engineerId => {
+    // alert(engineerId);
+    Geolocation.watchPosition(position => {
+      //
+      //alert('hello');
+      const lastPosition = JSON.stringify(position);
+      this.setState({lastPosition});
+
+      var data = new FormData();
+      data.append(
+        'currentLongitude',
+        JSON.stringify(position.coords.longitude),
+      );
+
+      data.append('currentLatitude', JSON.stringify(position.coords.latitude));
+      data.append('deviceid', DeviceInfo.getUniqueId());
+      data.append('engineerId', engineerId);
+
+      var xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+
+      xhr.addEventListener('readystatechange', function () {
+        if (this.readyState === 4) {
+        }
+      });
+
+      xhr.open('POST', 'http://103.219.0.103/api/insert2.php');
+      xhr.send(data);
+    });
+  };
+  componentWillUnmount = () => {
+    // Geolocation.clearWatch(this.watchID);
+  };
+
   getEngineerId = () => {
     AsyncStorage.getItem('token')
       .then(res => JSON.parse(res))
-      .then(data => this.getData(data.engineerId));
+      .then(data => {
+        this.setState({engineerId: data.engineerId});
+        // alert('the state is' + JSON.stringify(this.state));
+        this.getData(data.engineerId);
+      });
   };
   //
   getData = engineerid => {
@@ -215,8 +277,10 @@ class App extends Component {
       employee: this.state.employee.filter(emp => emp.id !== employeeId),
     });
   };
+
   render() {
-    // alert('hello');
+    // console.log('render function 270 the states Appl.js');
+    // console.log(this.state);
     const {
       loading,
       errorMessage,
