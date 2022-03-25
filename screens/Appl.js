@@ -7,6 +7,7 @@ import {
   StyleSheet,
   //
   TouchableOpacity,
+  Linking,
 } from 'react-native';
 import AddEmployeeModal from './AddEmployeeModal';
 import EditEmployeeModal from './EditEmployeeModal';
@@ -17,6 +18,7 @@ import {PermissionsAndroid} from 'react-native';
 //
 import DeviceInfo from 'react-native-device-info';
 import {json} from 'stream/consumers';
+// import call from 'react-native-phone-call';
 
 class App extends Component {
   constructor(props) {
@@ -65,6 +67,7 @@ class App extends Component {
     }
   };
   //   requestLocationPermission();
+
   getOneTimeLocationAsync = () => {
     AsyncStorage.getItem('token')
       .then(res => JSON.parse(res))
@@ -72,7 +75,6 @@ class App extends Component {
   };
 
   getOneTimeLocation = engineerId => {
-    //
     Geolocation.getCurrentPosition(
       //Will give you the current location
       position => {
@@ -102,8 +104,6 @@ class App extends Component {
         );
         data.append('deviceid', DeviceInfo.getUniqueId());
         data.append('engineerId', engineerId);
-        // console.log('line 99 appl.js');
-        // console.log(data);
 
         var xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
@@ -127,7 +127,6 @@ class App extends Component {
       },
     );
   };
-  //
 
   componentDidMount() {
     // console.log('props on line 163 appl.js');
@@ -187,6 +186,7 @@ class App extends Component {
       xhr.send(data);
     });
   };
+
   componentWillUnmount = () => {
     // Geolocation.clearWatch(this.watchID);
   };
@@ -278,6 +278,16 @@ class App extends Component {
     });
   };
 
+  makeCall = phoneNumber => {
+    if (Platform.OS === 'android') {
+      phoneNumber = 'tel:${' + phoneNumber + '}';
+    } else {
+      phoneNumber = 'telprompt:${' + phoneNumber + '}';
+    }
+
+    Linking.openURL(phoneNumber);
+  };
+
   render() {
     // console.log('render function 270 the states Appl.js');
     // console.log(this.state);
@@ -326,7 +336,12 @@ class App extends Component {
               <Text style={styles.buttonText}>Logout</Text>
             </TouchableOpacity>
           </View>
-          <View>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
             <TouchableOpacity
               onPress={this.getOneTimeLocationAsync}
               style={styles.button}>
@@ -368,6 +383,12 @@ class App extends Component {
                     {index + 1}.
                   </Text>
                   <Text style={styles.name}>{call.SubscriberName}</Text>
+                  <Text
+                    style={styles.listItem}
+                    onPress={() => this.makeCall(call.MobileNo)}>
+                    {'MobileNo: ' + call.MobileNo}
+                  </Text>
+
                   <Text style={styles.listItem}>
                     CallLogId: {call.CallLogId}
                   </Text>

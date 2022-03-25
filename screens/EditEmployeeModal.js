@@ -29,13 +29,13 @@ class EditEmployeeModal extends Component {
       loading: false,
       errorMessage: '',
       address: '',
+      MobileNo: 0,
     };
   }
   //
 
   componentDidMount() {
-    // state value is updated by selected employee data
-    // console.log(this.props);
+    // state value is updated by selected employee data    // console.log(this.props);
     const {
       CallLogId,
       CalltypeId,
@@ -48,8 +48,8 @@ class EditEmployeeModal extends Component {
       status,
       subscriberid,
       address,
+      MobileNo,
     } = this.props.selectedEmployee;
-    //
 
     this.setState({
       CallLogId: CallLogId,
@@ -68,20 +68,75 @@ class EditEmployeeModal extends Component {
       Replyid: 0,
       Reply: '',
       CreatedBy: 1,
+      //
+      MobileNo: MobileNo,
+      OTP1: '',
+      OTP: '',
     });
   }
-
   handleChange = (value, state) => {
     this.setState({[state]: value});
   };
 
-  updateEmployee = () => {
-    // console.log('state in updateEmployee');
+  makeid(length) {
+    var result = '';
+    var characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-    // alert(JSON.stringify(this.state));
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  }
 
-    const {complaintid, Reply, status, CreatedBy, Replyid} = this.state;
+  sendConfirmationOTP = () => {
     this.setState({errorMessage: '', loading: true});
+    var data = new FormData();
+    const OTP1 = this.makeid(5);
+    this.setState({OTP1: OTP1});
+
+    data.append('MobileNo', this.state.MobileNo);
+    data.append('CallLogId', OTP1);
+    data.append('SubscriberName', this.state.SubscriberName);
+    // console.log(data);
+    const InsertAPIURL = 'http://103.219.0.103/sla/call_verification.php';
+    fetch(InsertAPIURL, {
+      method: 'POST',
+      body: data,
+    })
+      .then(res => res.json())
+      .then(res => {
+        console.log(res);
+        if ((res.Status = 'success')) {
+          alert(res.Message);
+        }
+        this.setState({
+          loading: false,
+          errorMessage: '',
+        });
+      })
+      .catch(() =>
+        this.setState({
+          loading: false,
+          errorMessage: 'Network Error. Please try again.',
+        }),
+      );
+  };
+
+  updateEmployee = () => {
+    // console.log('state in updateEmployee');// console.log(this.state);// return;// alert(JSON.stringify(this.state));
+
+    const {complaintid, Reply, status, CreatedBy, Replyid, OTP, OTP1} =
+      this.state;
+    this.setState({errorMessage: '', loading: true});
+
+    console.log('OTP IS ' + OTP);
+    console.log('OTP1 IS ' + OTP1);
+    if (OTP != OTP1) {
+      alert('sorry confirmation otp does not match');
+      return;
+    }
 
     if (complaintid && Reply != '' && CreatedBy && Replyid != '') {
       // selected employee is updated with employee id
@@ -140,6 +195,7 @@ class EditEmployeeModal extends Component {
       address,
       Replyid,
       Reply,
+      MobileNo,
     } = this.state;
 
     return (
@@ -201,13 +257,15 @@ class EditEmployeeModal extends Component {
                 <Text style={styles.title2}>ComplaintId</Text>
                 <Text style={styles.title3}>{complaintid}</Text>
               </View>
-
               <View>
                 <Text style={styles.title2}>SubscriberId:</Text>
                 <Text style={styles.title3}>{subscriberid}</Text>
               </View>
             </View>
-
+            <View>
+              <Text style={styles.title2}>MobileNo:</Text>
+              <Text style={styles.title3}>{MobileNo}</Text>
+            </View>
             <Text style={styles.title2}>Address:</Text>
             <Text style={styles.title3}>{address}</Text>
 
@@ -218,7 +276,14 @@ class EditEmployeeModal extends Component {
               onChangeText={text => this.handleChange(text, 'Reply')}
               placeholder="Reply"
             />
+            <Text style={styles.title2}>CONFIRMATION OTP:</Text>
 
+            <TextInput
+              defaultValue={''}
+              style={styles.textBox}
+              onChangeText={text => this.handleChange(text, 'OTP')}
+              placeholder="OTP"
+            />
             <Text style={styles.title2}>Final Status:</Text>
             <Picker
               selectedValue={Replyid}
@@ -252,6 +317,12 @@ class EditEmployeeModal extends Component {
                 <Text style={styles.buttonText}>CLOSED</Text>
               </TouchableOpacity>
             )}
+            <TouchableOpacity
+              onPress={this.sendConfirmationOTP}
+              style={styles.button}>
+              <Text style={styles.buttonText}>CONFIRMATION OTP</Text>
+            </TouchableOpacity>
+
             {loading ? (
               <Text style={styles.message}>Please Wait...</Text>
             ) : errorMessage ? (
