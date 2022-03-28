@@ -30,6 +30,7 @@ class EditEmployeeModal extends Component {
       errorMessage: '',
       address: '',
       MobileNo: 0,
+      showclear: false,
     };
   }
   //
@@ -197,7 +198,7 @@ class EditEmployeeModal extends Component {
       Reply,
       MobileNo,
     } = this.state;
-
+    // console.log(this.state);
     return (
       <Modal
         propagateSwipe={true}
@@ -205,69 +206,147 @@ class EditEmployeeModal extends Component {
         onRequestClose={closeModal}
         animationType="slide">
         <ScrollView>
-          <View style={styles.container}>
-            <Text style={styles.title}>Update Call</Text>
-            <View style={styles.row}>
-              <View>
-                <Text style={styles.title2}>Call Id:</Text>
-                <Text style={styles.title3}>{CallLogId}</Text>
+          <View style={[styles.container]}>
+            <Text style={styles.title}>
+              Update Call{' '}
+              <Text
+                onPress={() => {
+                  this.setState({showclear: !this.state.showclear});
+                  // alert(this.state.showclear);
+                }}>
+                ( Details )
+              </Text>
+            </Text>
+
+            <View
+              style={{
+                flex: 1,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}>
+              <View style={{flex: 1, padding: 10}}>
+                <Text style={styles.title2}>CallLogId:</Text>
+                <TextInput
+                  editable={false}
+                  defaultValue={CallLogId}
+                  style={styles.textBox}
+                  placeholder="CallLogId"
+                />
               </View>
-              {/* <TextInput
-              value={CallLogId}
-              style={styles.textBox}
-              onChangeText={text => this.handleChange(text, 'CallLogId')}
-              placeholder="CallLogId"
-            /> */}
-              <View>
+
+              <View style={{flex: 1, padding: 10}}>
                 <Text style={styles.title2}>CallType:</Text>
-                <Text style={styles.title3}>
-                  {CalltypeId == 2 ? 'Complaint' : ''}
-                </Text>
+                <TextInput
+                  editable={false}
+                  defaultValue={CalltypeId == 2 ? 'Complaint' : ''}
+                  style={styles.textBox}
+                  placeholder="CallType"
+                />
               </View>
             </View>
-            <View style={styles.row}>
+            <Text style={styles.title2}>Description:</Text>
+            <TextInput
+              multiline={true}
+              numberOfLines={2}
+              editable={false}
+              defaultValue={Description}
+              style={styles.textBox}
+              placeholder="Description"
+            />
+            {this.state.showclear && (
               <View>
-                <Text style={styles.title2}>CustomerId:</Text>
-                <Text style={styles.title3}>{CustomerId}</Text>
-              </View>
-              <View>
-                <Text style={styles.title2}>Engineer:</Text>
-                <Text style={styles.title3}>{Engineer}</Text>
-              </View>
-            </View>
-            <View>
-              <Text style={styles.title2}>Description:</Text>
-              <Text style={styles.title3}>{Description}</Text>
-            </View>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}>
+                  <View style={{flex: 1, padding: 10}}>
+                    <Text style={styles.title2}>SubCallType:</Text>
+                    <TextInput
+                      editable={false}
+                      defaultValue={SubCallType}
+                      style={styles.textBox}
+                      placeholder="SubCallType"
+                    />
+                  </View>
 
-            <View style={styles.row}>
-              <View>
-                <Text style={styles.title2}>SubCallType:</Text>
-                <Text style={styles.title3}>{SubCallType}</Text>
-              </View>
+                  <View style={{flex: 1, padding: 10}}>
+                    <Text style={styles.title2}>complaintid:</Text>
+                    <TextInput
+                      editable={false}
+                      defaultValue={complaintid}
+                      style={styles.textBox}
+                      placeholder="complaintid"
+                    />
+                  </View>
+                </View>
 
-              <View>
-                <Text style={styles.title2}>SubscriberName:</Text>
-                <Text style={styles.title3}>{SubscriberName}</Text>
-              </View>
-            </View>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}>
+                  <View style={{flex: 1, padding: 10}}>
+                    <Text style={styles.title2}>subscriberid:</Text>
+                    <TextInput
+                      editable={false}
+                      defaultValue={subscriberid}
+                      style={styles.textBox}
+                      placeholder="subscriberid"
+                    />
+                  </View>
 
-            <View style={styles.row}>
-              <View>
-                <Text style={styles.title2}>ComplaintId</Text>
-                <Text style={styles.title3}>{complaintid}</Text>
+                  <View style={{flex: 1, padding: 10}}>
+                    <Text style={styles.title2}>SubscriberName</Text>
+                    <TextInput
+                      editable={false}
+                      defaultValue={SubscriberName}
+                      style={styles.textBox}
+                      placeholder="SubscriberName"
+                    />
+                  </View>
+                </View>
+
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}>
+                  <View style={{flex: 1, padding: 10}}>
+                    <Text style={styles.title2}>CustomerId:</Text>
+                    <TextInput
+                      editable={false}
+                      defaultValue={CustomerId}
+                      style={styles.textBox}
+                      placeholder="CustomerId"
+                    />
+                  </View>
+
+                  <View style={{flex: 1, padding: 10}}>
+                    <Text style={styles.title2}>Engineer:</Text>
+                    <TextInput
+                      editable={false}
+                      defaultValue={Engineer}
+                      style={styles.textBox}
+                      placeholder="Engineer"
+                    />
+                  </View>
+                </View>
+
+                <Text style={styles.title2}>Address:</Text>
+                <TextInput
+                  multiline={true}
+                  numberOfLines={2}
+                  editable={false}
+                  defaultValue={address}
+                  style={styles.textBox}
+                  placeholder="address"
+                />
               </View>
-              <View>
-                <Text style={styles.title2}>SubscriberId:</Text>
-                <Text style={styles.title3}>{subscriberid}</Text>
-              </View>
-            </View>
-            <View>
-              <Text style={styles.title2}>MobileNo:</Text>
-              <Text style={styles.title3}>{MobileNo}</Text>
-            </View>
-            <Text style={styles.title2}>Address:</Text>
-            <Text style={styles.title3}>{address}</Text>
+            )}
 
             <Text style={styles.title2}>Reply:</Text>
             <TextInput
@@ -284,39 +363,50 @@ class EditEmployeeModal extends Component {
               onChangeText={text => this.handleChange(text, 'OTP')}
               placeholder="OTP"
             />
-            <Text style={styles.title2}>Final Status:</Text>
-            <Picker
-              selectedValue={Replyid}
-              onValueChange={text => this.handleChange(text, 'Replyid')}>
-              <Picker.Item label="Select Final Status " value="" />
-              <Picker.Item label="Ok Accomplished" value="0" />
-              <Picker.Item label="Failed Not Accomplished" value="2" />
-              <Picker.Item label="Declined Inadmissible" value="3" />
-            </Picker>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}>
+              <View style={{flex: 1, padding: 10}}>
+                <Text style={styles.title2}>Final Status:</Text>
+                <Picker
+                  selectedValue={Replyid}
+                  onValueChange={text => this.handleChange(text, 'Replyid')}>
+                  <Picker.Item label="Select Final Status " value="" />
+                  <Picker.Item label="Ok Accomplished" value="0" />
+                  <Picker.Item label="Failed Not Accomplished" value="2" />
+                  <Picker.Item label="Declined Inadmissible" value="3" />
+                </Picker>
+              </View>
 
-            <Text style={styles.title2}>Status</Text>
-            {status ? (
-              <TouchableOpacity
-                style={{
-                  ...styles.button,
-                  marginVertical: 0,
-                  backgroundColor: '#034f84',
-                }}
-                //
-                onPress={() => this.setState({status: 0})}>
-                <Text style={styles.buttonText}>OPEN</Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                style={{
-                  ...styles.button,
-                  marginVertical: 0,
-                  backgroundColor: '#d64161',
-                }}
-                onPress={() => this.setState({status: 1})}>
-                <Text style={styles.buttonText}>CLOSED</Text>
-              </TouchableOpacity>
-            )}
+              <View style={{flex: 1, padding: 10}}>
+                <Text style={styles.title2}>Status</Text>
+                {status ? (
+                  <TouchableOpacity
+                    style={{
+                      ...styles.button,
+                      marginVertical: 0,
+                      backgroundColor: '#034f84',
+                    }}
+                    //
+                    onPress={() => this.setState({status: 0})}>
+                    <Text style={styles.buttonText}>OPEN</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    style={{
+                      ...styles.button,
+                      marginVertical: 0,
+                      backgroundColor: '#d64161',
+                    }}
+                    onPress={() => this.setState({status: 1})}>
+                    <Text style={styles.buttonText}>CLOSED</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
             <TouchableOpacity
               onPress={this.sendConfirmationOTP}
               style={styles.button}>

@@ -90,7 +90,7 @@ const RegisterScreen = navData => {
           <View style={styles.container}>
             <View style={styles.logo}>
               <Image
-                source={require('../assets/images/logo.png')}
+                source={{uri: 'https://medianucleus.com/images/logo1.png'}}
                 style={styles.image}
               />
             </View>

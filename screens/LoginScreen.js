@@ -17,17 +17,17 @@ import DeviceInfo from 'react-native-device-info';
 
 // import {useDispatch} from 'react-redux';
 // import * as authAction from '../redux/actions/authAction';
+import {useIsFocused} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const formSchema = yup.object({
   email: yup.string().email().required(),
   password: yup.string().required().min(6),
 });
-//
 
 const LoginScreen = navData => {
-  //
   // console.log(navData);
   // const dispatch = useDispatch();
+  const isFocused = useIsFocused();
 
   const loadProfile = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -38,11 +38,15 @@ const LoginScreen = navData => {
       navData.navigation.navigate('Home', {loggedinDetails: JSON.parse(token)});
     }
   };
-  //
 
   useEffect(() => {
     loadProfile();
-  });
+
+    if (isFocused) {
+      // alert('hello');
+    }
+  }, [navData, isFocused]);
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -102,8 +106,9 @@ const LoginScreen = navData => {
           <View style={styles.container}>
             <View style={styles.logo}>
               <Image
-                source={require('../assets/images/logo.png')}
+                source={{uri: 'https://medianucleus.com/images/logo1.png'}}
                 style={styles.image}
+                // source={require('../assets/images/logo.png')}
               />
             </View>
             <View>
