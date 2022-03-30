@@ -14,21 +14,16 @@ import {
 import {Formik} from 'formik';
 import * as yup from 'yup';
 import DeviceInfo from 'react-native-device-info';
-// import {useDispatch} from 'react-redux';
-
-// import * as authAction from '../redux/actions/authAction';
 
 const formSchema = yup.object({
   fullName: yup.string().required().min(3),
   email: yup.string().email().required(),
   password: yup.string().required().min(6),
 });
-//
 
 const RegisterScreen = navData => {
-  // const dispatch = useDispatch();
-
   return (
+    //
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{flex: 1}}>
@@ -44,6 +39,7 @@ const RegisterScreen = navData => {
 
           var InsertAPIURL = 'http://103.219.0.103/api/insert.php';
           let deviceId = DeviceInfo.getUniqueId();
+
           var data = new FormData();
 
           data.append('email', values.email);
@@ -68,26 +64,14 @@ const RegisterScreen = navData => {
               }
             }
           });
-          //
 
           xhr.open('POST', InsertAPIURL);
 
           xhr.send(data);
-        }}
-        // onSubmit={values => {
-        //   dispatch(authAction.registerUser(values))
-        //     .then(result => {
-        //       if (result.success) {
-        //         navData.navigation.navigate('Home');
-        //       } else {
-        //         Alert.alert('Registration failed. Try Again');
-        //       }
-        //     })
-        //     .catch(err => console.log(err));
-        // }}
-      >
+        }}>
         {props => (
           <View style={styles.container}>
+            {/* {console.log(props)} */}
             <View style={styles.logo}>
               <Image
                 source={{uri: 'https://medianucleus.com/images/logo1.png'}}
