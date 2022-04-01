@@ -6,7 +6,8 @@ const Stack = createStackNavigator();
 
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
-import HomeScreen from '../screens/Appl';
+import HomeScreen from '../screens/home/Appl';
+import SubscriberScreen from '../screens/subscribers/Appl';
 import About from '../screens/About';
 // import HomeScreen from '../screens/HomeScreen';
 function AppNavigator() {
@@ -28,11 +29,11 @@ function AppNavigator() {
           component={HomeScreen}
           options={{headerLeft: null}}
         />
-        <Stack.Screen
-          name="About"
-          component={About}
+        {/* <Stack.Screen
+          name="Subscribers"
+          component={SubscriberScreen}
           options={{headerShown: true}}
-        />
+        /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );

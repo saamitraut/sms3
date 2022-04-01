@@ -24,7 +24,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     // console.log('props on line 25 appl.js');
-    // console.log(props.route.params.loggedinDetails);
+    console.log(props);
 
     this.state = {
       calls: [],
@@ -303,11 +303,16 @@ class App extends Component {
     return (
       <ScrollView>
         <View style={styles.container}>
+          {/* navData.navigation.navigate('Home', {loggedinDetails: JSON.parse(token)}); */}
           {/* <TouchableOpacity
             onPress={this.toggleAddEmployeeModal}
             style={styles.button}>
             <Text style={styles.buttonText}>Add Call</Text>
           </TouchableOpacity> */}
+          <TouchableOpacity onPress={{}} style={styles.button}>
+            <Text style={styles.buttonText}>Subscribers</Text>
+          </TouchableOpacity>
+
           <View
             style={[
               styles.container,
