@@ -16,127 +16,67 @@ class EditEmployeeModal extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      CallLogId: '',
-      CalltypeId: 0,
+      Area: '',
       CustomerId: '',
-      Description: '',
-      Engineer: '',
-      SubCallType: '',
+      MobileNo: '',
+      Operator: '',
+      SocietyName: ';',
       SubscriberName: '',
-      complaintid: '',
-      status: 0,
       subscriberid: '',
       loading: false,
       errorMessage: '',
-      address: '',
-      MobileNo: 0,
       showclear: false,
+      FormNo: '',
+      pincode: '',
     };
   }
-  //
 
   componentDidMount() {
-    // state value is updated by selected employee data    // console.log(this.props);
+    //
     const {
-      CallLogId,
-      CalltypeId,
+      Area,
       CustomerId,
-      Description,
-      Engineer,
-      SubCallType,
-      SubscriberName,
-      complaintid,
-      status,
-      subscriberid,
-      address,
       MobileNo,
+      Operator,
+      SocietyName,
+      SubscriberName,
+      subscriberid,
+      FormNo,
+      pincode,
     } = this.props.selectedEmployee;
 
     this.setState({
-      CallLogId: CallLogId,
-      CalltypeId: CalltypeId,
+      Area: Area,
       CustomerId: CustomerId,
-      Description: Description,
-      Engineer: Engineer,
-      SubCallType: SubCallType,
+      MobileNo: MobileNo,
+      Operator: Operator,
+      SocietyName: SocietyName,
       SubscriberName: SubscriberName,
-      complaintid: complaintid,
-      status: status,
       subscriberid: subscriberid,
       loading: false,
       errorMessage: '',
-      address: address,
-      Replyid: 0,
-      Reply: '',
-      CreatedBy: 1,
-      //
-      MobileNo: MobileNo,
-      OTP1: '',
-      OTP: '',
+      FormNo: FormNo,
+      pincode: pincode,
     });
   }
+
   handleChange = (value, state) => {
     this.setState({[state]: value});
-  };
-
-  makeid(length) {
-    var characters = '0123456789';
-    var result = '';
-
-    var charactersLength = characters.length;
-    for (var i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-  }
-
-  sendConfirmationOTP = () => {
-    this.setState({errorMessage: '', loading: true});
-    var data = new FormData();
-    const OTP1 = this.makeid(5);
-    this.setState({OTP1: OTP1});
-
-    data.append('MobileNo', this.state.MobileNo);
-    data.append('CallLogId', OTP1);
-    data.append('SubscriberName', this.state.SubscriberName);
-    // console.log(data);
-    const InsertAPIURL = 'http://103.219.0.103/sla/call_verification.php';
-    fetch(InsertAPIURL, {
-      method: 'POST',
-      body: data,
-    })
-      .then(res => res.json())
-      .then(res => {
-        console.log(res);
-        if ((res.Status = 'success')) {
-          alert(res.Message);
-        }
-        this.setState({
-          loading: false,
-          errorMessage: '',
-        });
-      })
-      .catch(() =>
-        this.setState({
-          loading: false,
-          errorMessage: 'Network Error. Please try again.',
-        }),
-      );
   };
 
   updateEmployee = () => {
     // console.log('state in updateEmployee');// console.log(this.state);// return;// alert(JSON.stringify(this.state));
 
-    const {complaintid, Reply, status, CreatedBy, Replyid, OTP, OTP1} =
-      this.state;
+    const {
+      Area,
+      CustomerId,
+      MobileNo,
+      Operator,
+      SocietyName,
+      SubscriberName,
+      subscriberid,
+    } = this.state;
     this.setState({errorMessage: '', loading: true});
-
-    console.log('OTP IS ' + OTP);
-    console.log('OTP1 IS ' + OTP1);
-    if (OTP != OTP1) {
-      alert('sorry confirmation otp does not match');
-      return;
-    }
 
     if (complaintid && Reply != '' && CreatedBy && Replyid != '') {
       // selected employee is updated with employee id
@@ -180,22 +120,17 @@ class EditEmployeeModal extends Component {
   render() {
     const {isOpen, closeModal} = this.props;
     const {
-      CallLogId,
-      CalltypeId,
+      Area,
       CustomerId,
-      Description,
-      Engineer,
-      SubCallType,
+      MobileNo,
+      Operator,
+      SocietyName,
       SubscriberName,
-      complaintid,
-      status,
       subscriberid,
+      FormNo,
+      pincode,
       loading,
       errorMessage,
-      address,
-      Replyid,
-      Reply,
-      MobileNo,
     } = this.state;
     // console.log(this.state);
     return (
@@ -206,16 +141,7 @@ class EditEmployeeModal extends Component {
         animationType="slide">
         <ScrollView>
           <View style={[styles.container]}>
-            <Text style={styles.title}>
-              Update Call{' '}
-              <Text
-                onPress={() => {
-                  this.setState({showclear: !this.state.showclear});
-                  // alert(this.state.showclear);
-                }}>
-                ( Details )
-              </Text>
-            </Text>
+            <Text style={styles.title}>Update Subscriber Details</Text>
 
             <View
               style={{
@@ -224,144 +150,24 @@ class EditEmployeeModal extends Component {
                 justifyContent: 'space-between',
               }}>
               <View style={{flex: 1, padding: 10}}>
-                <Text style={styles.title2}>CallLogId:</Text>
+                <Text style={styles.title2}>MobileNo:</Text>
                 <TextInput
-                  editable={false}
-                  defaultValue={CallLogId}
+                  editable={true}
+                  defaultValue={MobileNo}
                   style={styles.textBox}
-                  placeholder="CallLogId"
+                  placeholder="MobileNo"
                 />
               </View>
-
               <View style={{flex: 1, padding: 10}}>
-                <Text style={styles.title2}>CallType:</Text>
+                <Text style={styles.title2}>CustomerId:</Text>
                 <TextInput
                   editable={false}
-                  defaultValue={CalltypeId == 2 ? 'Complaint' : ''}
+                  defaultValue={CustomerId}
                   style={styles.textBox}
-                  placeholder="CallType"
+                  placeholder="CustomerId"
                 />
               </View>
             </View>
-            <Text style={styles.title2}>Description:</Text>
-            <TextInput
-              multiline={true}
-              numberOfLines={2}
-              editable={false}
-              defaultValue={Description}
-              style={styles.textBox}
-              placeholder="Description"
-            />
-            {this.state.showclear && (
-              <View>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
-                  <View style={{flex: 1, padding: 10}}>
-                    <Text style={styles.title2}>SubCallType:</Text>
-                    <TextInput
-                      editable={false}
-                      defaultValue={SubCallType}
-                      style={styles.textBox}
-                      placeholder="SubCallType"
-                    />
-                  </View>
-
-                  <View style={{flex: 1, padding: 10}}>
-                    <Text style={styles.title2}>complaintid:</Text>
-                    <TextInput
-                      editable={false}
-                      defaultValue={complaintid}
-                      style={styles.textBox}
-                      placeholder="complaintid"
-                    />
-                  </View>
-                </View>
-
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
-                  <View style={{flex: 1, padding: 10}}>
-                    <Text style={styles.title2}>subscriberid:</Text>
-                    <TextInput
-                      editable={false}
-                      defaultValue={subscriberid}
-                      style={styles.textBox}
-                      placeholder="subscriberid"
-                    />
-                  </View>
-
-                  <View style={{flex: 1, padding: 10}}>
-                    <Text style={styles.title2}>SubscriberName</Text>
-                    <TextInput
-                      editable={false}
-                      defaultValue={SubscriberName}
-                      style={styles.textBox}
-                      placeholder="SubscriberName"
-                    />
-                  </View>
-                </View>
-
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
-                  <View style={{flex: 1, padding: 10}}>
-                    <Text style={styles.title2}>CustomerId:</Text>
-                    <TextInput
-                      editable={false}
-                      defaultValue={CustomerId}
-                      style={styles.textBox}
-                      placeholder="CustomerId"
-                    />
-                  </View>
-
-                  <View style={{flex: 1, padding: 10}}>
-                    <Text style={styles.title2}>Engineer:</Text>
-                    <TextInput
-                      editable={false}
-                      defaultValue={Engineer}
-                      style={styles.textBox}
-                      placeholder="Engineer"
-                    />
-                  </View>
-                </View>
-
-                <Text style={styles.title2}>Address:</Text>
-                <TextInput
-                  multiline={true}
-                  numberOfLines={2}
-                  editable={false}
-                  defaultValue={address}
-                  style={styles.textBox}
-                  placeholder="address"
-                />
-              </View>
-            )}
-
-            <Text style={styles.title2}>Reply:</Text>
-            <TextInput
-              defaultValue={Reply}
-              style={styles.textBox}
-              onChangeText={text => this.handleChange(text, 'Reply')}
-              placeholder="Reply"
-            />
-            <Text style={styles.title2}>CONFIRMATION OTP:</Text>
-
-            <TextInput
-              defaultValue={''}
-              style={styles.textBox}
-              onChangeText={text => this.handleChange(text, 'OTP')}
-              placeholder="OTP"
-            />
             <View
               style={{
                 flex: 1,
@@ -369,6 +175,62 @@ class EditEmployeeModal extends Component {
                 justifyContent: 'space-between',
               }}>
               <View style={{flex: 1, padding: 10}}>
+                <Text style={styles.title2}>subscriberid:</Text>
+                <TextInput
+                  editable={false}
+                  defaultValue={subscriberid}
+                  style={styles.textBox}
+                  placeholder="subscriberid"
+                />
+              </View>
+              <View style={{flex: 1, padding: 10}}>
+                <Text style={styles.title2}>FormNo:</Text>
+                <TextInput
+                  editable={false}
+                  defaultValue={FormNo}
+                  style={styles.textBox}
+                  placeholder="FormNo"
+                />
+              </View>
+            </View>
+            <Text style={styles.title2}>Area:</Text>
+            <TextInput
+              multiline={true}
+              numberOfLines={2}
+              editable={true}
+              defaultValue={Area}
+              style={styles.textBox}
+              placeholder="Area"
+            />
+            <Text style={styles.title2}>SocietyName:</Text>
+            <TextInput
+              defaultValue={SocietyName}
+              style={styles.textBox}
+              onChangeText={text => this.handleChange(text, 'SocietyName')}
+              placeholder="SocietyName"
+            />
+            <Text style={styles.title2}>Pin Code:</Text>
+            <TextInput
+              defaultValue={pincode}
+              style={styles.textBox}
+              onChangeText={text => this.handleChange(text, 'pincode')}
+              placeholder="pincode"
+            />
+            <Text style={styles.title2}>Subscriber:</Text>
+            <TextInput
+              defaultValue={Operator}
+              style={styles.textBox}
+              onChangeText={text => this.handleChange(text, 'Operator')}
+              placeholder="Operator"
+            />
+
+            <View
+              style={{
+                flex: 1,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}>
+              {/* <View style={{flex: 1, padding: 10}}>
                 <Text style={styles.title2}>Final Status:</Text>
                 <Picker
                   selectedValue={Replyid}
@@ -378,33 +240,7 @@ class EditEmployeeModal extends Component {
                   <Picker.Item label="Failed Not Accomplished" value="2" />
                   <Picker.Item label="Declined Inadmissible" value="3" />
                 </Picker>
-              </View>
-
-              <View style={{flex: 1, padding: 10}}>
-                <Text style={styles.title2}>Status</Text>
-                {status ? (
-                  <TouchableOpacity
-                    style={{
-                      ...styles.button,
-                      marginVertical: 0,
-                      backgroundColor: '#034f84',
-                    }}
-                    //
-                    onPress={() => this.setState({status: 0})}>
-                    <Text style={styles.buttonText}>OPEN</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    style={{
-                      ...styles.button,
-                      marginVertical: 0,
-                      backgroundColor: '#d64161',
-                    }}
-                    onPress={() => this.setState({status: 1})}>
-                    <Text style={styles.buttonText}>CLOSED</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
+              </View> */}
             </View>
             <TouchableOpacity
               onPress={this.sendConfirmationOTP}

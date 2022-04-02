@@ -15,10 +15,8 @@ import DeleteEmployeeModal from './deleteEmployeeModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Geolocation from '@react-native-community/geolocation';
 import {PermissionsAndroid} from 'react-native';
-//
 import DeviceInfo from 'react-native-device-info';
 import {json} from 'stream/consumers';
-// import call from 'react-native-phone-call';
 
 class App extends Component {
   constructor(props) {
@@ -27,17 +25,15 @@ class App extends Component {
     // console.log(props.route.params.loggedinDetails);
 
     this.state = {
-      calls: [],
+      subscribers: [],
       isAddEmployeeModalOpen: false,
       isEditEmployeeModalOpen: false,
       isDeleteEmployeeModalOpen: false,
       loading: false,
       errorMessage: '',
       selectedEmployee: {},
-      // engineerid: 0,
-      status: 0,
-      SubscriberName: '',
       deviceId: '',
+      loggedinDetails: {},
     };
   }
 
@@ -110,7 +106,7 @@ class App extends Component {
 
         xhr.addEventListener('readystatechange', function () {
           if (this.readyState === 4) {
-            alert(this.responseText);
+            // alert(this.responseText);
           }
         });
         xhr.open('POST', 'http://103.219.0.103/sla/savelocation.php');
@@ -129,21 +125,12 @@ class App extends Component {
   };
 
   componentDidMount() {
-    // console.log('props on line 163 appl.js');
-    // console.log(this.props.route.params.loggedinDetails);
-    // return;
     //    RECEIVING LOGGEDINDETAILS AS PROPS AND SAVING THEM AS CONSTANTS
+
     const {email, engineerId, fullName} =
       this.props.route.params.loggedinDetails;
 
-    // console.log(
-    //   'RECEIVING LOGGEDINDETAILS AS PROPS AND SAVING THEM AS CONSTANTS componentDidMount 163 Appl.js ',
-    // );
-    // console.log('email is ' + email);
-    // console.log('engineerId is ' + engineerId);
-    // console.log('fullName is ' + fullName);
-    // return;
-    // this.props.navigation.navigate('About');
+    this.setState({loggedinDetails: this.props.route.params.loggedinDetails});
 
     this.setState({email: email, engineerId: engineerId, fullName: fullName});
 
@@ -151,77 +138,36 @@ class App extends Component {
 
     this.getOneTimeLocation(engineerId);
 
-    this.getData(engineerId);
-
-    // this.watchID = this.getWatchId(engineerId);
+    this.getData({});
   }
-  //
-  getWatchId = engineerId => {
-    // alert(engineerId);
-    Geolocation.watchPosition(position => {
-      //
-      //alert('hello');
-      const lastPosition = JSON.stringify(position);
-      this.setState({lastPosition});
 
-      var data = new FormData();
-      data.append(
-        'currentLongitude',
-        JSON.stringify(position.coords.longitude),
-      );
-
-      data.append('currentLatitude', JSON.stringify(position.coords.latitude));
-      data.append('deviceid', DeviceInfo.getUniqueId());
-      data.append('engineerId', engineerId);
-
-      var xhr = new XMLHttpRequest();
-      xhr.withCredentials = true;
-
-      xhr.addEventListener('readystatechange', function () {
-        if (this.readyState === 4) {
-        }
-      });
-
-      xhr.open('POST', 'http://103.219.0.103/api/insert2.php');
-      xhr.send(data);
-    });
-  };
-
-  componentWillUnmount = () => {
-    // Geolocation.clearWatch(this.watchID);
-  };
-
-  getEngineerId = () => {
-    AsyncStorage.getItem('token')
-      .then(res => JSON.parse(res))
-      .then(data => {
-        this.setState({engineerId: data.engineerId});
-        // alert('the state is' + JSON.stringify(this.state));
-        this.getData(data.engineerId);
-      });
-  };
-  //
-  getData = engineerid => {
+  getData = props => {
     this.setState({errorMessage: '', loading: true});
     var data = new FormData();
 
-    data.append('EngineerId', engineerid);
-    data.append('status', this.state.status);
-    data.append('CallLogId', this.state.CallLogId);
-    data.append('SubscriberName', this.state.SubscriberName);
+    data.append('norows', 50);
+    data.append('pwd', 'cGFzc3dvcmQ%253D');
+    if (props.hasOwnProperty('SubscriberName')) {
+      data.append('SubscriberName', props.SubscriberName);
+    }
+    if (props.hasOwnProperty('MobileNo')) {
+      data.append('MobileNo', props.MobileNo);
+    }
 
-    const InsertAPIURL = 'http://103.219.0.103/sla/getCallDetails.php';
+    if (props.hasOwnProperty('CustomerId')) {
+      data.append('CustomerId', props.CustomerId);
+    }
+    const APIURL = 'http://103.219.0.103/sla/getSubscriberDetails.php';
 
-    fetch(InsertAPIURL, {
+    fetch(APIURL, {
       method: 'POST',
       body: data,
     })
       .then(res => res.json())
       .then(res => {
-        //
         // console.log(res),
         this.setState({
-          calls: res.data,
+          subscribers: res.data,
           loading: false,
           errorMessage: '',
         });
@@ -265,7 +211,7 @@ class App extends Component {
   updateEmployee = data => {
     // updating employee data with updated data if employee id is matched with updated data id
     this.setState({
-      calls: this.state.calls.map(call =>
+      subscribers: this.state.subscribers.map(call =>
         call.complaintid == data.complaintid ? data : call,
       ),
     });
@@ -316,22 +262,29 @@ class App extends Component {
                 justifyContent: 'space-between',
               },
             ]}>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => {
                 this.setState({status: 1});
                 this.getEngineerId();
               }}
-              style={[styles.button, {flex: 1, marginHorizontal: 5}]}>
-              <Text style={[styles.buttonText]}>Open Calls</Text>
+              style={[
+                styles.button,
+                {flex: 1, marginHorizontal: 5, display: 'none'},
+              ]}>
+              <Text style={[styles.buttonText]}>Open subscribers</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
                 this.setState({status: 0});
                 this.getEngineerId();
               }}
-              style={[styles.button, , {flex: 1, marginHorizontal: 5}]}>
-              <Text style={[styles.buttonText]}>Closed Calls</Text>
-            </TouchableOpacity>
+              style={[
+                styles.button,
+                ,
+                {flex: 1, marginHorizontal: 5, display: 'none'},
+              ]}>
+              <Text style={[styles.buttonText]}>Closed subscribers</Text>
+            </TouchableOpacity> */}
             <TouchableOpacity onPress={this.logout} style={styles.button}>
               <Text style={styles.buttonText}>Logout</Text>
             </TouchableOpacity>
@@ -347,63 +300,99 @@ class App extends Component {
               style={styles.button}>
               <Text style={styles.buttonText}>Hi</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                this.setState({
+                  SubscriberName: '',
+                  CustomerId: '',
+                  MobileNo: '',
+                });
+                this.getData({});
+              }}
+              style={styles.button}>
+              <Text style={styles.buttonText}>Clear</Text>
+            </TouchableOpacity>
           </View>
           <View style={styles.row}>
             <TextInput
               defaultValue={''}
               style={styles.textBox}
+              value={this.state.CustomerId}
               onChangeText={text => {
-                this.setState({CallLogId: text});
-                //
-                this.getEngineerId();
+                this.setState(
+                  {CustomerId: text},
+                  this.getData({CustomerId: text}),
+                );
               }}
-              placeholder="Search CallLogId"
+              placeholder="CustomerId"
             />
             <TextInput
               defaultValue={''}
               style={styles.textBox}
+              value={this.state.SubscriberName}
               onChangeText={text => {
-                this.setState({SubscriberName: text});
-                //
-                this.getEngineerId();
+                this.setState(
+                  {SubscriberName: text},
+                  this.getData({SubscriberName: text}),
+                );
               }}
               placeholder="SubscriberName"
             />
+            <TextInput
+              defaultValue={''}
+              style={styles.textBox}
+              value={this.state.MobileNo}
+              onChangeText={text => {
+                this.setState({MobileNo: text}, this.getData({MobileNo: text}));
+              }}
+              placeholder="MobileNo"
+            />
           </View>
-          <Text style={styles.title2}>
-            {this.state.status ? 'Open calls' : 'Closed calls'}
-          </Text>
-          {this.state.calls != undefined ? (
+          {/* <Text style={styles.title2}>
+            {this.state.status ? 'Open subscribers' : 'Closed subscribers'}
+          </Text> */}
+          {this.state.subscribers != undefined ? (
             <View>
-              <Text>Total Calls {this.state.calls.length}</Text>
-              <Text style={styles.title}>Call Lists:</Text>
-              {this.state.calls.map((call, index) => (
-                <View style={styles.employeeListContainer} key={call.CallLogId}>
+              {this.state.loading && (
+                <Text style={styles.title}>Please wait</Text>
+              )}
+              <Text>Total subscribers {this.state.subscribers.length}</Text>
+              <Text style={styles.title}>Subscribers</Text>
+              {this.state.subscribers.map((subscriber, index) => (
+                <View
+                  style={styles.employeeListContainer}
+                  key={subscriber.subscriberid}>
                   <Text style={{...styles.listItem, color: 'tomato'}}>
                     {index + 1}.
                   </Text>
-                  <Text style={styles.name}>{call.SubscriberName}</Text>
+                  <Text style={styles.name}>{subscriber.SubscriberName}</Text>
                   <Text
                     style={styles.listItem}
-                    onPress={() => this.makeCall(call.MobileNo)}>
-                    {'MobileNo: ' + call.MobileNo}
-                  </Text>
-
-                  <Text style={styles.listItem}>
-                    CallLogId: {call.CallLogId}
+                    onPress={() => this.makeCall(subscriber.MobileNo)}>
+                    {'MobileNo: ' + subscriber.MobileNo}
                   </Text>
                   <Text style={styles.listItem}>
-                    Last Reply: {call.ClosedReply}
+                    subscriberid: {subscriber.subscriberid}
                   </Text>
                   <Text style={styles.listItem}>
-                    Description: {call.Description}
+                    FormNo: {subscriber.FormNo}
                   </Text>
-                  <Text style={styles.listItem}>Address: {call.address} </Text>
+                  <Text style={styles.listItem}>
+                    CustomerId: {subscriber.CustomerId}
+                  </Text>
+                  <Text style={styles.listItem}>
+                    Operator: {subscriber.Operator}
+                  </Text>
+                  <Text style={styles.listItem}>Area: {subscriber.Area}</Text>
+                  <Text style={styles.listItem}>
+                    SocietyName: {subscriber.SocietyName}
+                  </Text>
                   <View style={styles.buttonContainer}>
                     <TouchableOpacity
                       onPress={() => {
                         this.toggleEditEmployeeModal();
-                        this.setState({selectedEmployee: call});
+                        this.setState({selectedEmployee: subscriber});
                       }}
                       style={{...styles.button, marginVertical: 0}}>
                       <Text style={styles.buttonText}>Edit</Text>
@@ -421,7 +410,7 @@ class App extends Component {
               ) : null}
             </View>
           ) : (
-            <Text>No calls</Text>
+            <Text>No subscribers</Text>
           )}
         </View>
       </ScrollView>

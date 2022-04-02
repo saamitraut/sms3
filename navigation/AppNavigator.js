@@ -9,7 +9,6 @@ import RegisterScreen from '../screens/RegisterScreen';
 import HomeScreen from '../screens/home/Appl';
 import SubscriberScreen from '../screens/subscribers/Appl';
 import About from '../screens/About';
-// import HomeScreen from '../screens/HomeScreen';
 function AppNavigator() {
   return (
     <NavigationContainer>
@@ -29,15 +28,14 @@ function AppNavigator() {
           component={HomeScreen}
           options={{headerLeft: null}}
         />
-        {/* <Stack.Screen
+        <Stack.Screen
           name="Subscribers"
           component={SubscriberScreen}
           options={{headerShown: true}}
-        /> */}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-//
 
 export default AppNavigator;

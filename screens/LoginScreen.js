@@ -24,8 +24,9 @@ const formSchema = yup.object({
   password: yup.string().required().min(6),
 });
 
-const LoginScreen = navData => {
-  // console.log(navData);
+const LoginScreen = props => {
+  // console.log('props on LoginScreen Line 29'); console.log(props.navigation); console.log(props.route);
+  // Each scrren gets navigation prop and route prop
   // const dispatch = useDispatch();
   const isFocused = useIsFocused();
 
@@ -34,8 +35,7 @@ const LoginScreen = navData => {
     // console.log('token on loginscreen line 34');console.log(token);
 
     if (token != null) {
-      // alert(token);
-      navData.navigation.navigate('Home', {loggedinDetails: JSON.parse(token)});
+      props.navigation.navigate('Home', {loggedinDetails: JSON.parse(token)});
     }
   };
 
@@ -45,7 +45,8 @@ const LoginScreen = navData => {
     if (isFocused) {
       // alert('hello');
     }
-  }, [navData, isFocused]);
+  }, [props, isFocused]);
+  //
 
   return (
     <KeyboardAvoidingView
@@ -88,7 +89,7 @@ const LoginScreen = navData => {
                     'token',
                     JSON.stringify(result.loggedinDetails),
                   );
-                  navData.navigation.navigate('Home', {
+                  props.navigation.navigate('Home', {
                     loggedinDetails: result.loggedinDetails,
                   });
                 } catch (err) {
@@ -145,7 +146,7 @@ const LoginScreen = navData => {
               <View style={styles.registerContainer}>
                 <Text style={styles.registerText}>Don't have account?</Text>
                 <TouchableOpacity
-                  onPress={() => navData.navigation.navigate('Register')}>
+                  onPress={() => props.navigation.navigate('Register')}>
                   <Text style={styles.registerButton}>Register</Text>
                 </TouchableOpacity>
               </View>

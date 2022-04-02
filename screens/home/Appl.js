@@ -24,7 +24,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     // console.log('props on line 25 appl.js');
-    console.log(props);
+    // console.log(props);
 
     this.state = {
       calls: [],
@@ -38,6 +38,7 @@ class App extends Component {
       status: 0,
       SubscriberName: '',
       deviceId: '',
+      loggedinDetails: '',
     };
   }
 
@@ -110,7 +111,7 @@ class App extends Component {
 
         xhr.addEventListener('readystatechange', function () {
           if (this.readyState === 4) {
-            alert(this.responseText);
+            // alert(this.responseText);
           }
         });
         xhr.open('POST', 'http://103.219.0.103/sla/savelocation.php');
@@ -129,21 +130,12 @@ class App extends Component {
   };
 
   componentDidMount() {
-    // console.log('props on line 163 appl.js');
-    // console.log(this.props.route.params.loggedinDetails);
-    // return;
     //    RECEIVING LOGGEDINDETAILS AS PROPS AND SAVING THEM AS CONSTANTS
+
     const {email, engineerId, fullName} =
       this.props.route.params.loggedinDetails;
 
-    // console.log(
-    //   'RECEIVING LOGGEDINDETAILS AS PROPS AND SAVING THEM AS CONSTANTS componentDidMount 163 Appl.js ',
-    // );
-    // console.log('email is ' + email);
-    // console.log('engineerId is ' + engineerId);
-    // console.log('fullName is ' + fullName);
-    // return;
-    // this.props.navigation.navigate('About');
+    this.setState({loggedinDetails: this.props.route.params.loggedinDetails});
 
     this.setState({email: email, engineerId: engineerId, fullName: fullName});
 
@@ -309,7 +301,13 @@ class App extends Component {
             style={styles.button}>
             <Text style={styles.buttonText}>Add Call</Text>
           </TouchableOpacity> */}
-          <TouchableOpacity onPress={{}} style={styles.button}>
+          <TouchableOpacity
+            onPress={() =>
+              this.props.navigation.navigate('Subscribers', {
+                loggedinDetails: this.state.loggedinDetails,
+              })
+            }
+            style={styles.button}>
             <Text style={styles.buttonText}>Subscribers</Text>
           </TouchableOpacity>
 
