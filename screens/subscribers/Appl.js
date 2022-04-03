@@ -34,8 +34,29 @@ class App extends Component {
       selectedEmployee: {},
       deviceId: '',
       loggedinDetails: {},
+      FName: '',
     };
   }
+  operators = [];
+  SubscriberTypes = ['', 'Residential', 'Commercial', 'Government'];
+  getOperators = () => {
+    var data = new FormData();
+
+    data.append('debug', 0);
+
+    const APIURL = 'http://103.219.0.103/sla/getOperatorDetails.php';
+
+    fetch(APIURL, {
+      method: 'POST',
+      body: data,
+    })
+      .then(res => res.json())
+      .then(res => {
+        this.operators = res.data;
+        // console.log('operators on line 57 subscribers appl');
+        // console.log(res);
+      });
+  };
 
   requestLocationPermission = async () => {
     if (Platform.OS === 'ios') {
@@ -139,6 +160,7 @@ class App extends Component {
     this.getOneTimeLocation(engineerId);
 
     this.getData({});
+    this.getOperators();
   }
 
   getData = props => {
@@ -147,8 +169,8 @@ class App extends Component {
 
     data.append('norows', 50);
     data.append('pwd', 'cGFzc3dvcmQ%253D');
-    if (props.hasOwnProperty('SubscriberName')) {
-      data.append('SubscriberName', props.SubscriberName);
+    if (props.hasOwnProperty('FName')) {
+      data.append('FName', props.FName);
     }
     if (props.hasOwnProperty('MobileNo')) {
       data.append('MobileNo', props.MobileNo);
@@ -211,8 +233,8 @@ class App extends Component {
   updateEmployee = data => {
     // updating employee data with updated data if employee id is matched with updated data id
     this.setState({
-      subscribers: this.state.subscribers.map(call =>
-        call.complaintid == data.complaintid ? data : call,
+      subscribers: this.state.subscribers.map(subscriber =>
+        subscriber.subscriberid == data.subscriberid ? data : subscriber,
       ),
     });
   };
@@ -233,7 +255,12 @@ class App extends Component {
 
     Linking.openURL(phoneNumber);
   };
+  getNAME = OperatorId => {
+    var operatorDetails = this.operators[OperatorId];
 
+    if (typeof operatorDetails != 'undefined') return operatorDetails.NAME;
+    return '';
+  };
   render() {
     // console.log('render function 270 the states Appl.js');
     // console.log(this.state);
@@ -262,29 +289,6 @@ class App extends Component {
                 justifyContent: 'space-between',
               },
             ]}>
-            {/* <TouchableOpacity
-              onPress={() => {
-                this.setState({status: 1});
-                this.getEngineerId();
-              }}
-              style={[
-                styles.button,
-                {flex: 1, marginHorizontal: 5, display: 'none'},
-              ]}>
-              <Text style={[styles.buttonText]}>Open subscribers</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                this.setState({status: 0});
-                this.getEngineerId();
-              }}
-              style={[
-                styles.button,
-                ,
-                {flex: 1, marginHorizontal: 5, display: 'none'},
-              ]}>
-              <Text style={[styles.buttonText]}>Closed subscribers</Text>
-            </TouchableOpacity> */}
             <TouchableOpacity onPress={this.logout} style={styles.button}>
               <Text style={styles.buttonText}>Logout</Text>
             </TouchableOpacity>
@@ -304,7 +308,7 @@ class App extends Component {
             <TouchableOpacity
               onPress={() => {
                 this.setState({
-                  SubscriberName: '',
+                  FName: '',
                   CustomerId: '',
                   MobileNo: '',
                 });
@@ -330,14 +334,11 @@ class App extends Component {
             <TextInput
               defaultValue={''}
               style={styles.textBox}
-              value={this.state.SubscriberName}
+              value={this.state.FName}
               onChangeText={text => {
-                this.setState(
-                  {SubscriberName: text},
-                  this.getData({SubscriberName: text}),
-                );
+                this.setState({FName: text}, this.getData({FName: text}));
               }}
-              placeholder="SubscriberName"
+              placeholder="FName"
             />
             <TextInput
               defaultValue={''}
@@ -360,20 +361,19 @@ class App extends Component {
               <Text>Total subscribers {this.state.subscribers.length}</Text>
               <Text style={styles.title}>Subscribers</Text>
               {this.state.subscribers.map((subscriber, index) => (
+                //
                 <View
                   style={styles.employeeListContainer}
                   key={subscriber.subscriberid}>
                   <Text style={{...styles.listItem, color: 'tomato'}}>
                     {index + 1}.
                   </Text>
-                  <Text style={styles.name}>{subscriber.SubscriberName}</Text>
-                  <Text
-                    style={styles.listItem}
-                    onPress={() => this.makeCall(subscriber.MobileNo)}>
-                    {'MobileNo: ' + subscriber.MobileNo}
-                  </Text>
-                  <Text style={styles.listItem}>
-                    subscriberid: {subscriber.subscriberid}
+                  <Text style={styles.name}>
+                    {subscriber.FName +
+                      ' ' +
+                      subscriber.Mname +
+                      ' ' +
+                      subscriber.LName}
                   </Text>
                   <Text style={styles.listItem}>
                     FormNo: {subscriber.FormNo}
@@ -382,12 +382,28 @@ class App extends Component {
                     CustomerId: {subscriber.CustomerId}
                   </Text>
                   <Text style={styles.listItem}>
-                    Operator: {subscriber.Operator}
+                    Subscriberid: {subscriber.subscriberid}
                   </Text>
-                  <Text style={styles.listItem}>Area: {subscriber.Area}</Text>
+                  <Text
+                    style={styles.listItem}
+                    onPress={() => this.makeCall(subscriber.MobileNo)}>
+                    {'MobileNo: ' + subscriber.MobileNo}
+                  </Text>
+                  <Text style={styles.listItem}>Email: {subscriber.email}</Text>
                   <Text style={styles.listItem}>
-                    SocietyName: {subscriber.SocietyName}
+                    SubscriberType: {/*  */}
+                    {this.SubscriberTypes[subscriber.SubscriberTypeId]}
                   </Text>
+                  <Text style={styles.listItem}>
+                    Address: {subscriber.Address}
+                  </Text>
+                  <Text style={styles.listItem}>
+                    PinCode: {subscriber.Zipcode}
+                  </Text>
+                  <Text style={styles.listItem}>
+                    Operator:{this.getNAME(subscriber.OperatorId)}{' '}
+                  </Text>
+
                   <View style={styles.buttonContainer}>
                     <TouchableOpacity
                       onPress={() => {

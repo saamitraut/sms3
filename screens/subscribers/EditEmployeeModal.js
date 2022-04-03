@@ -14,49 +14,58 @@ import {Picker} from '@react-native-picker/picker';
 
 class EditEmployeeModal extends Component {
   constructor(props) {
+    //
     super(props);
+
     this.state = {
-      Area: '',
+      FormNo: '',
       CustomerId: '',
-      MobileNo: '',
-      Operator: '',
-      SocietyName: ';',
-      SubscriberName: '',
       subscriberid: '',
+      MobileNo: '',
+      email: '',
+      SubscriberTypeId: 0,
+      Address: '',
+      Zipcode: '',
+      OperatorId: '',
+      FName: '',
+      Mname: '',
+      LName: '',
       loading: false,
       errorMessage: '',
       showclear: false,
-      FormNo: '',
       pincode: '',
     };
   }
 
   componentDidMount() {
-    //
     const {
-      Area,
-      CustomerId,
-      MobileNo,
-      Operator,
-      SocietyName,
-      SubscriberName,
-      subscriberid,
       FormNo,
-      pincode,
+      CustomerId,
+      subscriberid,
+      MobileNo,
+      email,
+      SubscriberTypeId,
+      Address,
+      Zipcode,
+      OperatorId,
+      FName,
+      Mname,
+      LName,
     } = this.props.selectedEmployee;
 
     this.setState({
-      Area: Area,
-      CustomerId: CustomerId,
-      MobileNo: MobileNo,
-      Operator: Operator,
-      SocietyName: SocietyName,
-      SubscriberName: SubscriberName,
-      subscriberid: subscriberid,
-      loading: false,
-      errorMessage: '',
       FormNo: FormNo,
-      pincode: pincode,
+      CustomerId: CustomerId,
+      subscriberid: subscriberid,
+      MobileNo: MobileNo,
+      email: email,
+      SubscriberTypeId: SubscriberTypeId,
+      Address: Address,
+      Zipcode: Zipcode,
+      OperatorId: OperatorId,
+      FName: FName,
+      Mname: Mname,
+      LName: LName,
     });
   }
 
@@ -66,38 +75,51 @@ class EditEmployeeModal extends Component {
 
   updateEmployee = () => {
     // console.log('state in updateEmployee');// console.log(this.state);// return;// alert(JSON.stringify(this.state));
-
     const {
-      Area,
+      FormNo,
       CustomerId,
-      MobileNo,
-      Operator,
-      SocietyName,
-      SubscriberName,
       subscriberid,
+      MobileNo,
+      email,
+      SubscriberTypeId,
+      Address,
+      Zipcode,
+      OperatorId,
+      FName,
+      Mname,
+      LName,
     } = this.state;
     this.setState({errorMessage: '', loading: true});
 
-    if (complaintid && Reply != '' && CreatedBy && Replyid != '') {
+    if (SubscriberTypeId != '') {
       // selected employee is updated with employee id
-      //
-
       var data = new FormData();
-      data.append('complaintid', complaintid);
-      data.append('Reply', Reply);
-      data.append('status', status);
-      data.append('CreatedBy', CreatedBy);
-      data.append('Replyid', Replyid);
-      // alert(JSON.stringify(data));
-      const updateAPIURL = 'http://103.219.0.103/sla/updateCallDetails.php';
+      data.append('FormNo', FormNo);
+      data.append('CustomerId', CustomerId);
+      data.append('subscriberid', subscriberid);
+      data.append('MobileNo', MobileNo);
+      data.append('email', email);
+      data.append('SubscriberTypeId', SubscriberTypeId);
+      data.append('Address', Address);
+      data.append('Zipcode', Zipcode);
+      data.append('OperatorId', OperatorId);
+      data.append('FName', FName);
+      data.append('Mname', Mname);
+      data.append('LName', LName);
+      data.append('updatedby', 1);
+      // alert(JSON.stringify(data));      return;
+      const updateAPIURL =
+        'http://103.219.0.103/sla/updateSubscriberDetails.php';
 
       fetch(updateAPIURL, {
         method: 'POST',
+
         body: data,
       })
         .then(res => res.json())
         .then(res => {
-          console.log(res);
+          //
+          console.log(JSON.stringify(res));
           if (res.status) {
             this.props.closeModal();
             this.props.updateEmployee(res.data);
@@ -120,15 +142,18 @@ class EditEmployeeModal extends Component {
   render() {
     const {isOpen, closeModal} = this.props;
     const {
-      Area,
-      CustomerId,
-      MobileNo,
-      Operator,
-      SocietyName,
-      SubscriberName,
-      subscriberid,
       FormNo,
-      pincode,
+      CustomerId,
+      subscriberid,
+      MobileNo,
+      email,
+      SubscriberTypeId,
+      Address,
+      Zipcode,
+      OperatorId,
+      FName,
+      Mname,
+      LName,
       loading,
       errorMessage,
     } = this.state;
@@ -150,14 +175,15 @@ class EditEmployeeModal extends Component {
                 justifyContent: 'space-between',
               }}>
               <View style={{flex: 1, padding: 10}}>
-                <Text style={styles.title2}>MobileNo:</Text>
+                <Text style={styles.title2}>FormNo:</Text>
                 <TextInput
-                  editable={true}
-                  defaultValue={MobileNo}
+                  editable={false}
+                  defaultValue={FormNo}
                   style={styles.textBox}
-                  placeholder="MobileNo"
+                  placeholder="FormNo"
                 />
               </View>
+
               <View style={{flex: 1, padding: 10}}>
                 <Text style={styles.title2}>CustomerId:</Text>
                 <TextInput
@@ -184,44 +210,48 @@ class EditEmployeeModal extends Component {
                 />
               </View>
               <View style={{flex: 1, padding: 10}}>
-                <Text style={styles.title2}>FormNo:</Text>
+                <Text style={styles.title2}>MobileNo:</Text>
                 <TextInput
-                  editable={false}
-                  defaultValue={FormNo}
+                  editable={true}
+                  defaultValue={MobileNo}
                   style={styles.textBox}
-                  placeholder="FormNo"
+                  placeholder="MobileNo"
+                  onChangeText={text => this.handleChange(text, 'MobileNo')}
                 />
               </View>
             </View>
-            <Text style={styles.title2}>Area:</Text>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}>
+              <View style={{flex: 1, padding: 10}}>
+                <Text style={styles.title2}>email:</Text>
+                <TextInput
+                  editable={true}
+                  defaultValue={email}
+                  onChangeText={text => this.handleChange(text, 'email')}
+                  style={styles.textBox}
+                  placeholder="email"
+                />
+              </View>
+              <View style={{flex: 1, padding: 10}}>
+                <Text style={styles.title2}>Pin Code:</Text>
+                <TextInput
+                  defaultValue={Zipcode}
+                  style={styles.textBox}
+                  onChangeText={text => this.handleChange(text, 'Zipcode')}
+                  placeholder="Zipcode"
+                />
+              </View>
+            </View>
+
             <TextInput
-              multiline={true}
-              numberOfLines={2}
-              editable={true}
-              defaultValue={Area}
-              style={styles.textBox}
-              placeholder="Area"
-            />
-            <Text style={styles.title2}>SocietyName:</Text>
-            <TextInput
-              defaultValue={SocietyName}
-              style={styles.textBox}
-              onChangeText={text => this.handleChange(text, 'SocietyName')}
-              placeholder="SocietyName"
-            />
-            <Text style={styles.title2}>Pin Code:</Text>
-            <TextInput
-              defaultValue={pincode}
-              style={styles.textBox}
-              onChangeText={text => this.handleChange(text, 'pincode')}
-              placeholder="pincode"
-            />
-            <Text style={styles.title2}>Subscriber:</Text>
-            <TextInput
-              defaultValue={Operator}
-              style={styles.textBox}
-              onChangeText={text => this.handleChange(text, 'Operator')}
-              placeholder="Operator"
+              defaultValue={OperatorId}
+              style={[styles.textBox, {display: 'none'}]}
+              onChangeText={text => this.handleChange(text, 'OperatorId')}
+              placeholder="OperatorId"
             />
 
             <View
@@ -230,23 +260,25 @@ class EditEmployeeModal extends Component {
                 flexDirection: 'row',
                 justifyContent: 'space-between',
               }}>
-              {/* <View style={{flex: 1, padding: 10}}>
-                <Text style={styles.title2}>Final Status:</Text>
+              <View style={{flex: 1, padding: 10}}>
+                <Text style={styles.title2}>SubscriberType:</Text>
                 <Picker
-                  selectedValue={Replyid}
-                  onValueChange={text => this.handleChange(text, 'Replyid')}>
-                  <Picker.Item label="Select Final Status " value="" />
-                  <Picker.Item label="Ok Accomplished" value="0" />
-                  <Picker.Item label="Failed Not Accomplished" value="2" />
-                  <Picker.Item label="Declined Inadmissible" value="3" />
+                  selectedValue={SubscriberTypeId}
+                  onValueChange={text =>
+                    this.handleChange(text, 'SubscriberTypeId')
+                  }>
+                  <Picker.Item label="Select SubscriberType " value="" />
+                  <Picker.Item label="Residential" value="1" />
+                  <Picker.Item label="Commercial" value="2" />
+                  <Picker.Item label="Government" value="3" />
                 </Picker>
-              </View> */}
+              </View>
             </View>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={this.sendConfirmationOTP}
               style={styles.button}>
               <Text style={styles.buttonText}>CONFIRMATION OTP</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             {loading ? (
               <Text style={styles.message}>Please Wait...</Text>
@@ -257,7 +289,6 @@ class EditEmployeeModal extends Component {
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 onPress={this.updateEmployee}
-                // onPress={() => alert('hello')}
                 style={{...styles.button, marginVertical: 0}}>
                 <Text style={styles.buttonText}>Update</Text>
               </TouchableOpacity>
