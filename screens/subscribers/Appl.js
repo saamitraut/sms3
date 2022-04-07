@@ -13,10 +13,7 @@ import AddEmployeeModal from './AddEmployeeModal';
 import EditEmployeeModal from './EditEmployeeModal';
 import DeleteEmployeeModal from './deleteEmployeeModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Geolocation from '@react-native-community/geolocation';
-import {PermissionsAndroid} from 'react-native';
-import DeviceInfo from 'react-native-device-info';
-import {json} from 'stream/consumers';
+//
 
 class App extends Component {
   constructor(props) {
@@ -57,33 +54,6 @@ class App extends Component {
         // console.log(res);
       });
   };
-
-  requestLocationPermission = async () => {
-    if (Platform.OS === 'ios') {
-      getOneTimeLocation();
-      subscribeLocationLocation();
-    } else {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-          {
-            title: 'Location Access Required',
-            message: 'This App needs to Access your location',
-          },
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          //To Check, If Permission is granted
-          //   this.getOneTimeLocation();
-          //   this.subscribeLocationLocation();
-        } else {
-          this.setState({locationStatus: 'Permission Denied'});
-        }
-      } catch (err) {
-        console.warn(err);
-      }
-    }
-  };
-  //   requestLocationPermission();
 
   getOneTimeLocationAsync = () => {
     AsyncStorage.getItem('token')
@@ -146,21 +116,22 @@ class App extends Component {
   };
 
   componentDidMount() {
-    //    RECEIVING LOGGEDINDETAILS AS PROPS AND SAVING THEM AS CONSTANTS
+    AsyncStorage.getItem('token')
+      .then(res => JSON.parse(res))
+      .then(data => {
+        const loggedinDetails = data;
+        const {email, engineerId, fullName} = loggedinDetails;
+        this.setState({loggedinDetails: loggedinDetails});
 
-    const {email, engineerId, fullName} =
-      this.props.route.params.loggedinDetails;
+        this.setState({
+          email: email,
+          engineerId: engineerId,
+          fullName: fullName,
+        });
 
-    this.setState({loggedinDetails: this.props.route.params.loggedinDetails});
-
-    this.setState({email: email, engineerId: engineerId, fullName: fullName});
-
-    this.requestLocationPermission();
-
-    this.getOneTimeLocation(engineerId);
-
-    this.getData({});
-    this.getOperators();
+        this.getData({});
+        this.getOperators();
+      });
   }
 
   getData = props => {

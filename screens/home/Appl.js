@@ -132,19 +132,29 @@ class App extends Component {
   componentDidMount() {
     //    RECEIVING LOGGEDINDETAILS AS PROPS AND SAVING THEM AS CONSTANTS
 
-    const {email, engineerId, fullName} =
-      this.props.route.params.loggedinDetails;
+    AsyncStorage.getItem('token')
+      .then(res => JSON.parse(res))
+      .then(data => {
+        const loggedinDetails = data;
 
-    this.setState({loggedinDetails: this.props.route.params.loggedinDetails});
+        const {email, engineerId, fullName} = loggedinDetails;
 
-    this.setState({email: email, engineerId: engineerId, fullName: fullName});
+        this.setState({
+          loggedinDetails: loggedinDetails,
+        });
 
-    this.requestLocationPermission();
+        this.setState({
+          email: email,
+          engineerId: engineerId,
+          fullName: fullName,
+        });
 
-    this.getOneTimeLocation(engineerId);
+        this.requestLocationPermission();
 
-    this.getData(engineerId);
+        this.getOneTimeLocation(engineerId);
 
+        this.getData(engineerId);
+      });
     // this.watchID = this.getWatchId(engineerId);
   }
   //
@@ -301,7 +311,7 @@ class App extends Component {
             style={styles.button}>
             <Text style={styles.buttonText}>Add Call</Text>
           </TouchableOpacity> */}
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() =>
               this.props.navigation.navigate('Subscribers', {
                 loggedinDetails: this.state.loggedinDetails,
@@ -309,7 +319,7 @@ class App extends Component {
             }
             style={styles.button}>
             <Text style={styles.buttonText}>Subscribers</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <View
             style={[
