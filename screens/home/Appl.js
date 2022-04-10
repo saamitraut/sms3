@@ -181,7 +181,6 @@ class App extends Component {
         this.getData(data.engineerId);
       });
   };
-  //
 
   getData = () => {
     this.setState({errorMessage: '', loading: true});
@@ -311,16 +310,14 @@ class App extends Component {
             ]}>
             <TouchableOpacity
               onPress={() => {
-                this.setState({status: 1});
-                this.getEngineerId();
+                this.setState({status: 1}, () => this.getData());
               }}
               style={[styles.button, {flex: 1, marginHorizontal: 5}]}>
               <Text style={[styles.buttonText]}>Open Calls</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                this.setState({status: 0});
-                this.getEngineerId();
+                this.setState({status: 0}, () => this.getData());
               }}
               style={[styles.button, , {flex: 1, marginHorizontal: 5}]}>
               <Text style={[styles.buttonText]}>Closed Calls</Text>
@@ -336,7 +333,7 @@ class App extends Component {
               justifyContent: 'space-between',
             }}>
             <TouchableOpacity
-              onPress={this.getOneTimeLocationAsync}
+              onPress={this.getOneTimeLocation}
               style={styles.button}>
               <Text style={styles.buttonText}>Hi</Text>
             </TouchableOpacity>
