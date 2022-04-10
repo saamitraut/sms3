@@ -15,16 +15,14 @@ import DeleteEmployeeModal from './deleteEmployeeModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Geolocation from '@react-native-community/geolocation';
 import {PermissionsAndroid} from 'react-native';
-//
 import DeviceInfo from 'react-native-device-info';
 import {json} from 'stream/consumers';
-// import call from 'react-native-phone-call';
 
 class App extends Component {
   constructor(props) {
     super(props);
-    // console.log('props on line 25 appl.js');
-    // console.log(props);
+    const {loggedinDetails} = props.route.params;
+    const {email, engineerId, fullName} = loggedinDetails;
 
     this.state = {
       calls: [],
@@ -34,11 +32,13 @@ class App extends Component {
       loading: false,
       errorMessage: '',
       selectedEmployee: {},
-      // engineerid: 0,
       status: 0,
       SubscriberName: '',
       deviceId: '',
-      loggedinDetails: '',
+      loggedinDetails: loggedinDetails,
+      email: email,
+      engineerId: engineerId,
+      fullName: fullName,
     };
   }
 
@@ -75,7 +75,7 @@ class App extends Component {
       .then(data => this.getOneTimeLocation(data.engineerId));
   };
 
-  getOneTimeLocation = engineerId => {
+  getOneTimeLocation = () => {
     Geolocation.getCurrentPosition(
       //Will give you the current location
       position => {
@@ -97,14 +97,13 @@ class App extends Component {
           'currentLongitude',
           JSON.stringify(position.coords.longitude),
         );
-        // return;
 
         data.append(
           'currentLatitude',
           JSON.stringify(position.coords.latitude),
         );
         data.append('deviceid', DeviceInfo.getUniqueId());
-        data.append('engineerId', engineerId);
+        data.append('engineerId', this.state.engineerId);
 
         var xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
@@ -130,31 +129,11 @@ class App extends Component {
   };
 
   componentDidMount() {
-    //    RECEIVING LOGGEDINDETAILS AS PROPS AND SAVING THEM AS CONSTANTS
+    this.requestLocationPermission();
+    this.getOneTimeLocation();
 
-    AsyncStorage.getItem('token')
-      .then(res => JSON.parse(res))
-      .then(data => {
-        const loggedinDetails = data;
+    this.getData();
 
-        const {email, engineerId, fullName} = loggedinDetails;
-
-        this.setState({
-          loggedinDetails: loggedinDetails,
-        });
-
-        this.setState({
-          email: email,
-          engineerId: engineerId,
-          fullName: fullName,
-        });
-
-        this.requestLocationPermission();
-
-        this.getOneTimeLocation(engineerId);
-
-        this.getData(engineerId);
-      });
     // this.watchID = this.getWatchId(engineerId);
   }
   //
@@ -203,11 +182,12 @@ class App extends Component {
       });
   };
   //
-  getData = engineerid => {
+
+  getData = () => {
     this.setState({errorMessage: '', loading: true});
     var data = new FormData();
 
-    data.append('EngineerId', engineerid);
+    data.append('EngineerId', this.state.engineerId);
     data.append('status', this.state.status);
     data.append('CallLogId', this.state.CallLogId);
     data.append('SubscriberName', this.state.SubscriberName);
