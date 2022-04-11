@@ -16,14 +16,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Geolocation from '@react-native-community/geolocation';
 import {PermissionsAndroid} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
-import {json} from 'stream/consumers';
+import DatePicker2 from '../DatePicker2';
+import Icon1 from 'react-native-vector-icons/Feather';
+import Icon2 from 'react-native-vector-icons/MaterialIcons';
 
 class App extends Component {
   constructor(props) {
     super(props);
+
     const {loggedinDetails} = props.route.params;
     const {email, engineerId, fullName} = loggedinDetails;
-
+    var date = new Date();
     this.state = {
       calls: [],
       isAddEmployeeModalOpen: false,
@@ -39,6 +42,8 @@ class App extends Component {
       email: email,
       engineerId: engineerId,
       fullName: fullName,
+      updatedon: date,
+      // date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(),
     };
   }
 
@@ -76,14 +81,15 @@ class App extends Component {
   };
 
   getOneTimeLocation = () => {
+    alert('Will give you the current location');
     Geolocation.getCurrentPosition(
-      //Will give you the current location
       position => {
         //getting the Longitude from the location json
         const currentLongitude = JSON.stringify(position.coords.longitude);
         //getting the Latitude from the location json
         const currentLatitude = JSON.stringify(position.coords.latitude);
-
+        console.log('position on line 91 screens/home/appl');
+        alert(position);
         //Setting Longitude state
         this.setState({currentLongitude});
 
@@ -104,13 +110,13 @@ class App extends Component {
         );
         data.append('deviceid', DeviceInfo.getUniqueId());
         data.append('engineerId', this.state.engineerId);
-
+        alert(JSON.stringify(data));
         var xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
 
         xhr.addEventListener('readystatechange', function () {
           if (this.readyState === 4) {
-            // alert(this.responseText);
+            alert(this.responseText);
           }
         });
         xhr.open('POST', 'http://103.219.0.103/sla/savelocation.php');
@@ -118,12 +124,13 @@ class App extends Component {
         xhr.send(data);
       },
       error => {
-        //setLocationStatus(error.message);
+        // setLocationStatus(error.message);
+        console.log(error);
       },
       {
         enableHighAccuracy: false,
         timeout: 30000,
-        maximumAge: 1000,
+        maximumAge: 10000,
       },
     );
   };
@@ -133,7 +140,7 @@ class App extends Component {
     this.getOneTimeLocation();
 
     this.getData();
-
+    // alert('componentDidMount is called');
     // this.watchID = this.getWatchId(engineerId);
   }
   //
@@ -185,11 +192,12 @@ class App extends Component {
   getData = () => {
     this.setState({errorMessage: '', loading: true});
     var data = new FormData();
-
+    // alert('getdata called');
     data.append('EngineerId', this.state.engineerId);
     data.append('status', this.state.status);
     data.append('CallLogId', this.state.CallLogId);
     data.append('SubscriberName', this.state.SubscriberName);
+    data.append('updatedon', this.state.updatedon.toISOString().slice(0, 10));
 
     const InsertAPIURL = 'http://103.219.0.103/sla/getCallDetails.php';
 
@@ -268,6 +276,7 @@ class App extends Component {
 
     Linking.openURL(phoneNumber);
   };
+  update = date => this.setState({updatedon: date, status: 0});
 
   render() {
     // console.log('render function 270 the states Appl.js');
@@ -308,14 +317,38 @@ class App extends Component {
                 justifyContent: 'space-between',
               },
             ]}>
-            <TouchableOpacity
+            <Icon1
+              name={'phone-call'}
+              size={50}
+              color={'#6699cc'}
+              style={{flex: 1, marginTop: 20, marginHorizontal: 5}}
+              onPress={() => {
+                this.setState({status: 1}, () => this.getData());
+              }}
+            />
+            <Icon2
+              name={'phone-callback'}
+              size={50}
+              color={'#6699CC'}
+              style={{flex: 1, marginTop: 20, marginHorizontal: 5}}
+              onPress={() => {
+                this.setState({status: 0}, () => this.getData());
+              }}
+            />
+            <DatePicker2
+              update={this.update}
+              updatedon={this.state.updatedon}
+              getData={this.getData}
+            />
+            {/* <TouchableOpacity
               onPress={() => {
                 this.setState({status: 1}, () => this.getData());
               }}
               style={[styles.button, {flex: 1, marginHorizontal: 5}]}>
               <Text style={[styles.buttonText]}>Open Calls</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </TouchableOpacity> */}
+
+            {/* <TouchableOpacity
               onPress={() => {
                 this.setState({status: 0}, () => this.getData());
               }}
@@ -324,7 +357,7 @@ class App extends Component {
             </TouchableOpacity>
             <TouchableOpacity onPress={this.logout} style={styles.button}>
               <Text style={styles.buttonText}>Logout</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
           <View
             style={{
@@ -343,9 +376,7 @@ class App extends Component {
               defaultValue={''}
               style={styles.textBox}
               onChangeText={text => {
-                this.setState({CallLogId: text});
-                //
-                this.getEngineerId();
+                this.setState({CallLogId: text}, () => this.getData());
               }}
               placeholder="Search CallLogId"
             />
@@ -353,15 +384,15 @@ class App extends Component {
               defaultValue={''}
               style={styles.textBox}
               onChangeText={text => {
-                this.setState({SubscriberName: text});
-                //
-                this.getEngineerId();
+                this.setState({SubscriberName: text}, () => this.getData());
               }}
               placeholder="SubscriberName"
             />
           </View>
           <Text style={styles.title2}>
-            {this.state.status ? 'Open calls' : 'Closed calls'}
+            {this.state.status
+              ? 'Open calls'
+              : 'Closed calls on ' + this.state.updatedon.toDateString()}
           </Text>
           {this.state.calls != undefined ? (
             <View>
