@@ -8,7 +8,7 @@ import BottomTabNavigator from './navigation/BottomTabNavigation';
 //
 
 export default function App() {
-  return <BottomTabNavigator />;
+  return <AppNavigator />;
 }
 //
 

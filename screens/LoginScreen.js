@@ -25,9 +25,12 @@ const formSchema = yup.object({
 });
 
 const LoginScreen = props => {
-  // console.log('props on LoginScreen Line 29'); console.log(props.navigation); console.log(props.route);
+  // console.log('props on LoginScreen Line 29');  console.log(props.navigation);
+  // console.log(props.route);
   // Each scrren gets navigation prop and route prop
   // const dispatch = useDispatch();
+  const {navigation} = props;
+  // console.log(navigation);
   const isFocused = useIsFocused();
 
   const loadProfile = async () => {
@@ -40,13 +43,13 @@ const LoginScreen = props => {
   };
 
   useEffect(() => {
-    loadProfile();
+    // logout();
+    // loadProfile();
 
     if (isFocused) {
       // alert('hello');
     }
   }, [props, isFocused]);
-  //
 
   return (
     <KeyboardAvoidingView
@@ -77,7 +80,7 @@ const LoginScreen = props => {
             body: data,
           })
             .then(response => response.json())
-            .then(async result => {
+            .then(result => {
               // console.log(
               //   'result received after hitting login api in LoginScreen on line 77',
               // );
@@ -85,13 +88,14 @@ const LoginScreen = props => {
 
               if (result.success) {
                 try {
-                  await AsyncStorage.setItem(
+                  AsyncStorage.setItem(
                     'token',
                     JSON.stringify(result.loggedinDetails),
+                  ).then(
+                    props.navigation.navigate('BottomTabNavigator', {
+                      loggedinDetails: result.loggedinDetails,
+                    }),
                   );
-                  props.navigation.navigate('Home', {
-                    loggedinDetails: result.loggedinDetails,
-                  });
                 } catch (err) {
                   console.log(err);
                 }
@@ -146,7 +150,7 @@ const LoginScreen = props => {
               <View style={styles.registerContainer}>
                 <Text style={styles.registerText}>Don't have account?</Text>
                 <TouchableOpacity
-                  onPress={() => props.navigation.navigate('Register')}>
+                  onPress={() => navigation.navigate('Register')}>
                   <Text style={styles.registerButton}>Register</Text>
                 </TouchableOpacity>
               </View>

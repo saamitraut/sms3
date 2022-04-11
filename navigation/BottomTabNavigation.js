@@ -1,82 +1,75 @@
 import * as React from 'react';
-import {Text, View} from 'react-native';
+import {Text, View, Alert} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-// import AppNavigator from './AppNavigator';
-// import SubscriberNavigator from './SubscriberNavigator';
 import Icon from 'react-native-vector-icons/Ionicons';
-//
+import Icon2 from 'react-native-vector-icons/AntDesign';
 import Subscribers from '../screens/subscribers/Appl';
+//
 import Calls from '../screens/home/Appl';
+import HomeScreen from '../screens/Home';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function HomeScreen() {
-  return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Text>Home!.............</Text>
-    </View>
-  );
-}
-
-function SettingsScreen() {
-  return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Text>Settings!</Text>
-    </View>
-  );
-}
-
+const Logout = () => {
+  return <Text>Logout</Text>;
+};
 const Tab = createBottomTabNavigator();
 
-export default function App() {
+export default function App({navigation, route}) {
+  const {loggedinDetails} = route.params;
   return (
-    <NavigationContainer>
-      {/* <Tab.Navigator> */}
-      <Tab.Navigator
-        screenOptions={({route}) => ({
-          tabBarIcon: ({focused, color, size}) => {
-            let iconName;
-            iconName = 'call';
-
-            if (route.name === 'Home') {
-              iconName = focused ? 'home' : 'home-outline';
-            }
-            if (route.name === 'Calls') {
-              iconName = focused ? 'call' : 'call-outline';
-            }
-            if (route.name === 'Subscribers') {
-              //
-              iconName = focused ? 'people' : 'people-outline';
-            }
+    <Tab.Navigator
+      screenOptions={({route}) => ({
+        tabBarIcon: ({focused, color, size}) => {
+          let iconName;
+          if (route.name === 'Home') {
+            iconName = focused ? 'home' : 'home-outline';
+          }
+          if (route.name === 'Calls') {
+            iconName = focused ? 'call' : 'call-outline';
+          }
+          if (route.name === 'Subscribers') {
+            //
+            iconName = focused ? 'people' : 'people-outline';
+          }
+          if (route.name === 'Logout') {
+            return <Icon2 name="logout" size={size} color={color} />;
+          } else {
             return <Icon name={iconName} size={size} color={color} />;
+          }
+        },
+        tabBarActiveTintColor: '#6699CC',
+        tabBarInActiveTintColor: 'gray',
+      })}>
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        initialParams={{loggedinDetails: loggedinDetails}}
+      />
+      <Tab.Screen
+        name="Calls"
+        component={Calls}
+        initialParams={{loggedinDetails: loggedinDetails}}
+      />
+      <Tab.Screen
+        name="Subscribers"
+        component={Subscribers}
+        initialParams={{loggedinDetails: loggedinDetails}}
+      />
+      <Tab.Screen
+        name="Logout"
+        component={Logout}
+        listeners={{
+          tabPress: e => {
+            e.preventDefault(); // Use this to navigate somewhere else
+            AsyncStorage.removeItem('token')
+              .then(() => {
+                navigation.navigate('Login');
+              })
+              .catch(err => console.log(err));
           },
-          tabBarActiveTintColor: '#696969',
-          tabBarInActiveTintColor: 'gray',
-        })}>
-        {/* <Tab.Navigator
-        screenOptions={({route}) => ({
-          tabBarIcon: ({focused, color, size}) => {
-            let iconName;
-            if (route.name === 'Home') {
-              iconName = focused
-                ? 'ios-information-circle'
-                : 'ios-information-circle-outline';
-            } else if (route.name === 'Calls') {
-              iconName = focused ? 'ios-list-box' : 'ios-list';
-            } else if (route.name === 'Subscribers') {
-              iconName = focused ? 'ios-list-box' : 'ios-list';
-            }
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-        })}
-        tabBarOptions={{
-          activeTintColor: 'tomato',
-          inactiveTintColor: 'gray',
-        }}> */}
-        <Tab.Screen name="Home" component={HomeScreen} />
-        {/* <Tab.Screen name="Calls" component={AppNavigator} /> */}
-        <Tab.Screen name="Calls" component={Calls} />
-        <Tab.Screen name="Subscribers" component={Subscribers} />
-      </Tab.Navigator>
-    </NavigationContainer>
+        }}
+      />
+    </Tab.Navigator>
   );
 }
