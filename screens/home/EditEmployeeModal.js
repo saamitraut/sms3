@@ -346,85 +346,88 @@ class EditEmployeeModal extends Component {
                 />
               </View>
             )}
+            <View style={{display: 'none'}}>
+              <Text style={styles.title2}>Reply:</Text>
+              <TextInput
+                defaultValue={Reply}
+                style={styles.textBox}
+                onChangeText={text => this.handleChange(text, 'Reply')}
+                placeholder="Reply"
+              />
+              <Text style={styles.title2}>CONFIRMATION OTP:</Text>
 
-            <Text style={styles.title2}>Reply:</Text>
-            <TextInput
-              defaultValue={Reply}
-              style={styles.textBox}
-              onChangeText={text => this.handleChange(text, 'Reply')}
-              placeholder="Reply"
-            />
-            <Text style={styles.title2}>CONFIRMATION OTP:</Text>
+              <TextInput
+                defaultValue={''}
+                style={styles.textBox}
+                onChangeText={text => this.handleChange(text, 'OTP')}
+                placeholder="OTP"
+              />
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}>
+                <View style={{flex: 1, padding: 10}}>
+                  <Text style={styles.title2}>Final Status:</Text>
+                  <Picker
+                    selectedValue={Replyid}
+                    onValueChange={text => this.handleChange(text, 'Replyid')}>
+                    <Picker.Item label="Select Final Status " value="" />
+                    <Picker.Item label="Ok Accomplished" value="0" />
+                    <Picker.Item label="Failed Not Accomplished" value="2" />
+                    <Picker.Item label="Declined Inadmissible" value="3" />
+                  </Picker>
+                </View>
 
-            <TextInput
-              defaultValue={''}
-              style={styles.textBox}
-              onChangeText={text => this.handleChange(text, 'OTP')}
-              placeholder="OTP"
-            />
-            <View
-              style={{
-                flex: 1,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
-              <View style={{flex: 1, padding: 10}}>
-                <Text style={styles.title2}>Final Status:</Text>
-                <Picker
-                  selectedValue={Replyid}
-                  onValueChange={text => this.handleChange(text, 'Replyid')}>
-                  <Picker.Item label="Select Final Status " value="" />
-                  <Picker.Item label="Ok Accomplished" value="0" />
-                  <Picker.Item label="Failed Not Accomplished" value="2" />
-                  <Picker.Item label="Declined Inadmissible" value="3" />
-                </Picker>
+                <View style={{flex: 1, padding: 10}}>
+                  <Text style={styles.title2}>Status</Text>
+                  {status ? (
+                    <TouchableOpacity
+                      style={{
+                        ...styles.button,
+                        marginVertical: 0,
+                        backgroundColor: '#034f84',
+                      }}
+                      //
+                      onPress={() => this.setState({status: 0})}>
+                      <Text style={styles.buttonText}>OPEN</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      style={{
+                        ...styles.button,
+                        marginVertical: 0,
+                        backgroundColor: '#d64161',
+                      }}
+                      onPress={() => this.setState({status: 1})}>
+                      <Text style={styles.buttonText}>CLOSED</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               </View>
-
-              <View style={{flex: 1, padding: 10}}>
-                <Text style={styles.title2}>Status</Text>
-                {status ? (
-                  <TouchableOpacity
-                    style={{
-                      ...styles.button,
-                      marginVertical: 0,
-                      backgroundColor: '#034f84',
-                    }}
-                    //
-                    onPress={() => this.setState({status: 0})}>
-                    <Text style={styles.buttonText}>OPEN</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    style={{
-                      ...styles.button,
-                      marginVertical: 0,
-                      backgroundColor: '#d64161',
-                    }}
-                    onPress={() => this.setState({status: 1})}>
-                    <Text style={styles.buttonText}>CLOSED</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
+              <TouchableOpacity
+                onPress={this.sendConfirmationOTP}
+                style={styles.button}>
+                <Text style={styles.buttonText}>CONFIRMATION OTP</Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              onPress={this.sendConfirmationOTP}
-              style={styles.button}>
-              <Text style={styles.buttonText}>CONFIRMATION OTP</Text>
-            </TouchableOpacity>
-
             {loading ? (
               <Text style={styles.message}>Please Wait...</Text>
             ) : errorMessage ? (
               <Text style={styles.message}>{errorMessage}</Text>
             ) : null}
-
             <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                onPress={this.updateEmployee}
-                // onPress={() => alert('hello')}
-                style={{...styles.button, marginVertical: 0}}>
-                <Text style={styles.buttonText}>Update</Text>
-              </TouchableOpacity>
+              {this.state.status == 1 ? (
+                <TouchableOpacity
+                  onPress={this.updateEmployee}
+                  // onPress={() => alert('hello')}
+                  style={{...styles.button, marginVertical: 0}}>
+                  <Text style={styles.buttonText}>Update</Text>
+                </TouchableOpacity>
+              ) : (
+                <Text></Text>
+              )}
 
               <TouchableOpacity
                 onPress={closeModal}
