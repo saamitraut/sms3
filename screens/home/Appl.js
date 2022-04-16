@@ -5,28 +5,36 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  //
   TouchableOpacity,
   Linking,
 } from 'react-native';
+
 import AddEmployeeModal from './AddEmployeeModal';
 import EditEmployeeModal from './EditEmployeeModal';
 import DeleteEmployeeModal from './deleteEmployeeModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Geolocation from '@react-native-community/geolocation';
+import Geolocation from 'react-native-geolocation-service'; //V IMP
+//import Geolocation from '@react-native-community/geolocation';
 import {PermissionsAndroid} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
-import DatePicker2 from '../DatePicker2';
+import DatePicker2 from '../../components/DatePicker2';
 import Icon1 from 'react-native-vector-icons/Feather';
 import Icon2 from 'react-native-vector-icons/MaterialIcons';
+import FlashMessage from 'react-native-flash-message';
+import {showMessage, hideMessage} from 'react-native-flash-message';
+import {
+  requestLocationPermission,
+  getOneTimeLocation,
+} from '../../helpers/locationHelper';
 
 class App extends Component {
   constructor(props) {
     super(props);
+    const {loggedinDetails, status} = props.route.params;
+    const {email, engineerId, fullName, userid} = loggedinDetails;
 
-    const {loggedinDetails} = props.route.params;
-    const {email, engineerId, fullName} = loggedinDetails;
     var date = new Date();
+
     this.state = {
       calls: [],
       isAddEmployeeModalOpen: false,
@@ -35,7 +43,8 @@ class App extends Component {
       loading: false,
       errorMessage: '',
       selectedEmployee: {},
-      status: 0,
+      //
+      status: status == 'undefined' ? 1 : status,
       SubscriberName: '',
       deviceId: '',
       loggedinDetails: loggedinDetails,
@@ -44,104 +53,18 @@ class App extends Component {
       fullName: fullName,
       updatedon: date,
       // date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(),
+      locationStatus: '',
     };
   }
+  //
 
-  requestLocationPermission = async () => {
-    if (Platform.OS === 'ios') {
-      getOneTimeLocation();
-      subscribeLocationLocation();
-    } else {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-          {
-            title: 'Location Access Required',
-            message: 'This App needs to Access your location',
-          },
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          //To Check, If Permission is granted
-          //   this.getOneTimeLocation();
-          //   this.subscribeLocationLocation();
-        } else {
-          this.setState({locationStatus: 'Permission Denied'});
-        }
-      } catch (err) {
-        console.warn(err);
-      }
-    }
-  };
-  //   requestLocationPermission();
-
-  getOneTimeLocationAsync = () => {
-    AsyncStorage.getItem('token')
-      .then(res => JSON.parse(res))
-      .then(data => this.getOneTimeLocation(data.engineerId));
-  };
-
-  getOneTimeLocation = () => {
-    alert('Will give you the current location');
-    Geolocation.getCurrentPosition(
-      position => {
-        //getting the Longitude from the location json
-        const currentLongitude = JSON.stringify(position.coords.longitude);
-        //getting the Latitude from the location json
-        const currentLatitude = JSON.stringify(position.coords.latitude);
-        console.log('position on line 91 screens/home/appl');
-        alert(position);
-        //Setting Longitude state
-        this.setState({currentLongitude});
-
-        //Setting Longitude state
-        this.setState({currentLatitude});
-
-        //save location in database
-        var data = new FormData();
-
-        data.append(
-          'currentLongitude',
-          JSON.stringify(position.coords.longitude),
-        );
-
-        data.append(
-          'currentLatitude',
-          JSON.stringify(position.coords.latitude),
-        );
-        data.append('deviceid', DeviceInfo.getUniqueId());
-        data.append('engineerId', this.state.engineerId);
-        alert(JSON.stringify(data));
-        var xhr = new XMLHttpRequest();
-        xhr.withCredentials = true;
-
-        xhr.addEventListener('readystatechange', function () {
-          if (this.readyState === 4) {
-            alert(this.responseText);
-          }
-        });
-        xhr.open('POST', 'http://103.219.0.103/sla/savelocation.php');
-
-        xhr.send(data);
-      },
-      error => {
-        // setLocationStatus(error.message);
-        console.log(error);
-      },
-      {
-        enableHighAccuracy: false,
-        timeout: 30000,
-        maximumAge: 10000,
-      },
-    );
-  };
+  PermissionDenied = () => this.setState({locationStatus: 'Permission Denied'});
 
   componentDidMount() {
-    this.requestLocationPermission();
-    this.getOneTimeLocation();
+    requestLocationPermission(this.PermissionDenied);
+    getOneTimeLocation(this.state.engineerId);
 
     this.getData();
-    // alert('componentDidMount is called');
-    // this.watchID = this.getWatchId(engineerId);
   }
   //
   getWatchId = engineerId => {
@@ -174,25 +97,11 @@ class App extends Component {
       xhr.send(data);
     });
   };
-
-  componentWillUnmount = () => {
-    // Geolocation.clearWatch(this.watchID);
-  };
-
-  getEngineerId = () => {
-    AsyncStorage.getItem('token')
-      .then(res => JSON.parse(res))
-      .then(data => {
-        this.setState({engineerId: data.engineerId});
-        // alert('the state is' + JSON.stringify(this.state));
-        this.getData(data.engineerId);
-      });
-  };
+  // componentWillUnmount = () => {Geolocation.clearWatch(this.watchID);};
 
   getData = () => {
     this.setState({errorMessage: '', loading: true});
     var data = new FormData();
-    // alert('getdata called');
     data.append('EngineerId', this.state.engineerId);
     data.append('status', this.state.status);
     data.append('CallLogId', this.state.CallLogId);
@@ -207,8 +116,6 @@ class App extends Component {
     })
       .then(res => res.json())
       .then(res => {
-        //
-        // console.log(res),
         this.setState({
           calls: res.data,
           loading: false,
@@ -253,11 +160,16 @@ class App extends Component {
 
   updateEmployee = data => {
     // updating employee data with updated data if employee id is matched with updated data id
-    this.setState({
-      calls: this.state.calls.map(call =>
-        call.complaintid == data.complaintid ? data : call,
-      ),
-    });
+    this.setState(
+      {
+        calls: this.state.calls.map(call =>
+          call.complaintid == data.complaintid ? data : call,
+        ),
+        //
+        status: 0,
+      },
+      () => this.getData(),
+    );
   };
 
   deleteEmployee = employeeId => {
@@ -276,11 +188,10 @@ class App extends Component {
 
     Linking.openURL(phoneNumber);
   };
-  update = date => this.setState({updatedon: date, status: 0});
+
+  update = date => this.setState({updatedon: date, status: 0}, this.getData);
 
   render() {
-    // console.log('render function 270 the states Appl.js');
-    // console.log(this.state);
     const {
       loading,
       errorMessage,
@@ -293,22 +204,11 @@ class App extends Component {
     return (
       <ScrollView>
         <View style={styles.container}>
-          {/* navData.navigation.navigate('Home', {loggedinDetails: JSON.parse(token)}); */}
           {/* <TouchableOpacity
             onPress={this.toggleAddEmployeeModal}
             style={styles.button}>
             <Text style={styles.buttonText}>Add Call</Text>
           </TouchableOpacity> */}
-          {/* <TouchableOpacity
-            onPress={() =>
-              this.props.navigation.navigate('Subscribers', {
-                loggedinDetails: this.state.loggedinDetails,
-              })
-            }
-            style={styles.button}>
-            <Text style={styles.buttonText}>Subscribers</Text>
-          </TouchableOpacity> */}
-
           <View
             style={[
               styles.container,
@@ -335,41 +235,20 @@ class App extends Component {
                 this.setState({status: 0}, () => this.getData());
               }}
             />
-            <DatePicker2
-              update={this.update}
-              updatedon={this.state.updatedon}
-              getData={this.getData}
+            <DatePicker2 update={this.update} />
+            <Icon2
+              name={'my-location'}
+              size={50}
+              color={'#6699CC'}
+              style={{flex: 1, marginTop: 20, marginHorizontal: 5}}
+              onPress={() => {
+                this.getOneTimeLocation();
+              }}
             />
-            {/* <TouchableOpacity
-              onPress={() => {
-                this.setState({status: 1}, () => this.getData());
-              }}
-              style={[styles.button, {flex: 1, marginHorizontal: 5}]}>
-              <Text style={[styles.buttonText]}>Open Calls</Text>
-            </TouchableOpacity> */}
-
-            {/* <TouchableOpacity
-              onPress={() => {
-                this.setState({status: 0}, () => this.getData());
-              }}
-              style={[styles.button, , {flex: 1, marginHorizontal: 5}]}>
-              <Text style={[styles.buttonText]}>Closed Calls</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={this.logout} style={styles.button}>
-              <Text style={styles.buttonText}>Logout</Text>
-            </TouchableOpacity> */}
           </View>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <TouchableOpacity
-              onPress={this.getOneTimeLocation}
-              style={styles.button}>
-              <Text style={styles.buttonText}>Hi</Text>
-            </TouchableOpacity>
+
+          <View>
+            <Text style={{color: 'red'}}>{this.state.locationStatus}</Text>
           </View>
           <View style={styles.row}>
             <TextInput
@@ -427,7 +306,12 @@ class App extends Component {
                         this.setState({selectedEmployee: call});
                       }}
                       style={{...styles.button, marginVertical: 0}}>
-                      <Text style={styles.buttonText}>Edit</Text>
+                      {/* <Text style={styles.buttonText}>Edit</Text> */}
+                      {this.state.status ? (
+                        <Icon1 style={styles.buttonText} name="edit-3"></Icon1>
+                      ) : (
+                        <Icon1 style={styles.buttonText} name="eye"></Icon1>
+                      )}
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -438,6 +322,7 @@ class App extends Component {
                   closeModal={this.toggleEditEmployeeModal}
                   selectedEmployee={selectedEmployee}
                   updateEmployee={this.updateEmployee}
+                  loggedinDetails={this.state.loggedinDetails}
                 />
               ) : null}
             </View>
@@ -445,6 +330,8 @@ class App extends Component {
             <Text>No calls</Text>
           )}
         </View>
+
+        <FlashMessage position="top" />
       </ScrollView>
     );
   }
@@ -461,7 +348,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginVertical: 20,
     alignSelf: 'flex-start',
-    backgroundColor: 'gray',
+    backgroundColor: '#6699cc',
   },
   buttonText: {
     color: 'white',
