@@ -260,9 +260,9 @@ class App extends Component {
                 justifyContent: 'space-between',
               },
             ]}>
-            <TouchableOpacity onPress={this.logout} style={styles.button}>
+            {/* <TouchableOpacity onPress={this.logout} style={styles.button}>
               <Text style={styles.buttonText}>Logout</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
           <View
             style={{

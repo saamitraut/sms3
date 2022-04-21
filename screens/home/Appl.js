@@ -27,12 +27,15 @@ import {
   getOneTimeLocation,
 } from '../../helpers/locationHelper';
 
+import OpenCalls from '../../components/OpenCalls';
+import ClosedCalls from '../../components/ClosedCalls';
+
 class App extends Component {
   constructor(props) {
     super(props);
     const {loggedinDetails, status} = props.route.params;
     const {email, engineerId, fullName, userid} = loggedinDetails;
-
+    // console.log(typeof status == 'undefined' ? 1 : status);
     var date = new Date();
 
     this.state = {
@@ -43,7 +46,6 @@ class App extends Component {
       loading: false,
       errorMessage: '',
       selectedEmployee: {},
-      //
       status: status == 'undefined' ? 1 : status,
       SubscriberName: '',
       deviceId: '',
@@ -56,17 +58,40 @@ class App extends Component {
       locationStatus: '',
     };
   }
-  //
+  updateStatus = status => this.setState({status: status});
 
   PermissionDenied = () => this.setState({locationStatus: 'Permission Denied'});
 
+  updateStateCalls = data =>
+    this.setState({
+      calls: data,
+      loading: false,
+      errorMessage: '',
+    });
+
+  hideError = () => this.setState({errorMessage: '', loading: true});
+
+  showError = () =>
+    this.setState({
+      loading: false,
+      errorMessage: 'Network Error. Please try again.',
+    });
+  //
+
   componentDidMount() {
     requestLocationPermission(this.PermissionDenied);
+
     getOneTimeLocation(this.state.engineerId);
 
-    this.getData();
+    this.getData(
+      this.state.engineerId,
+      this.state.status,
+      this.state.CallLogId,
+      this.state.SubscriberName,
+      this.state.updatedon.toISOString().slice(0, 10),
+    );
   }
-  //
+
   getWatchId = engineerId => {
     // alert(engineerId);
     Geolocation.watchPosition(position => {
@@ -97,17 +122,19 @@ class App extends Component {
       xhr.send(data);
     });
   };
+
   // componentWillUnmount = () => {Geolocation.clearWatch(this.watchID);};
 
-  getData = () => {
-    this.setState({errorMessage: '', loading: true});
-    var data = new FormData();
-    data.append('EngineerId', this.state.engineerId);
-    data.append('status', this.state.status);
-    data.append('CallLogId', this.state.CallLogId);
-    data.append('SubscriberName', this.state.SubscriberName);
-    data.append('updatedon', this.state.updatedon.toISOString().slice(0, 10));
+  getData = (EngineerId, status, CallLogId, SubscriberName, updatedon) => {
+    this.hideError();
 
+    var data = new FormData();
+
+    data.append('EngineerId', EngineerId);
+    data.append('status', status);
+    data.append('CallLogId', CallLogId);
+    data.append('SubscriberName', SubscriberName);
+    data.append('updatedon', updatedon);
     const InsertAPIURL = 'http://103.219.0.103/sla/getCallDetails.php';
 
     fetch(InsertAPIURL, {
@@ -115,20 +142,10 @@ class App extends Component {
       body: data,
     })
       .then(res => res.json())
-      .then(res => {
-        this.setState({
-          calls: res.data,
-          loading: false,
-          errorMessage: '',
-        });
-      })
-      .catch(() =>
-        this.setState({
-          loading: false,
-          errorMessage: 'Network Error. Please try again.',
-        }),
-      );
+      .then(res => this.updateStateCalls(res.data))
+      .catch(() => this.showError());
   };
+
   logout = () => {
     AsyncStorage.removeItem('token')
       .then(() => {
@@ -168,7 +185,14 @@ class App extends Component {
         //
         status: 0,
       },
-      () => this.getData(),
+      () =>
+        this.getData(
+          this.state.engineerId,
+          this.state.status,
+          this.state.CallLogId,
+          this.state.SubscriberName,
+          this.state.updatedon.toISOString().slice(0, 10),
+        ),
     );
   };
 
@@ -189,7 +213,33 @@ class App extends Component {
     Linking.openURL(phoneNumber);
   };
 
-  update = date => this.setState({updatedon: date, status: 0}, this.getData);
+  update = date => {
+    // console.log(date);
+    this.setState(
+      {updatedon: date, status: 0},
+      this.getData(
+        this.state.engineerId,
+        0,
+        this.state.CallLogId,
+        this.state.SubscriberName,
+        date.toISOString().slice(0, 10),
+      ),
+    );
+  };
+
+  updateCalls = data =>
+    this.setState({
+      calls: data,
+      loading: false,
+      errorMessage: '',
+    });
+
+  updateError = () => {
+    this.setState({
+      loading: false,
+      errorMessage: 'Network Error. Please try again.',
+    });
+  };
 
   render() {
     const {
@@ -217,24 +267,26 @@ class App extends Component {
                 justifyContent: 'space-between',
               },
             ]}>
-            <Icon1
-              name={'phone-call'}
-              size={50}
-              color={'#6699cc'}
-              style={{flex: 1, marginTop: 20, marginHorizontal: 5}}
-              onPress={() => {
-                this.setState({status: 1}, () => this.getData());
+            <OpenCalls
+              params={{
+                engineerId: this.state.engineerId,
+                updateStateCalls: this.updateStateCalls,
+                showError: this.showError,
+                hideError: this.hideError,
+                updateStatus: this.updateStatus,
               }}
             />
-            <Icon2
-              name={'phone-callback'}
-              size={50}
-              color={'#6699CC'}
-              style={{flex: 1, marginTop: 20, marginHorizontal: 5}}
-              onPress={() => {
-                this.setState({status: 0}, () => this.getData());
+            <ClosedCalls
+              params={{
+                engineerId: this.state.engineerId,
+                updatedon: new Date(),
+                updateStateCalls: this.updateStateCalls,
+                showError: this.showError,
+                hideError: this.hideError,
+                updateStatus: this.updateStatus,
               }}
             />
+
             <DatePicker2 update={this.update} />
             <Icon2
               name={'my-location'}
@@ -255,7 +307,15 @@ class App extends Component {
               defaultValue={''}
               style={styles.textBox}
               onChangeText={text => {
-                this.setState({CallLogId: text}, () => this.getData());
+                this.setState({CallLogId: text}, () =>
+                  this.getData(
+                    this.state.engineerId,
+                    this.state.status,
+                    this.state.CallLogId,
+                    this.state.SubscriberName,
+                    this.state.updatedon.toISOString().slice(0, 10),
+                  ),
+                );
               }}
               placeholder="Search CallLogId"
             />
@@ -263,7 +323,15 @@ class App extends Component {
               defaultValue={''}
               style={styles.textBox}
               onChangeText={text => {
-                this.setState({SubscriberName: text}, () => this.getData());
+                this.setState({SubscriberName: text}, () =>
+                  this.getData(
+                    this.state.engineerId,
+                    this.state.status,
+                    this.state.CallLogId,
+                    this.state.SubscriberName,
+                    this.state.updatedon.toISOString().slice(0, 10),
+                  ),
+                );
               }}
               placeholder="SubscriberName"
             />
@@ -306,7 +374,7 @@ class App extends Component {
                         this.setState({selectedEmployee: call});
                       }}
                       style={{...styles.button, marginVertical: 0}}>
-                      {/* <Text style={styles.buttonText}>Edit</Text> */}
+                      {/* <Text style={styles.buttonText}>{this.state.status}</Text> */}
                       {this.state.status ? (
                         <Icon1 style={styles.buttonText} name="edit-3"></Icon1>
                       ) : (

@@ -8,6 +8,7 @@ import Subscribers from '../screens/subscribers/Appl';
 //
 import Calls from '../screens/home/Appl';
 import HomeScreen from '../screens/Home';
+import DashBoard from '../screens/Dashboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Logout = () => {
@@ -43,7 +44,7 @@ export default function App({navigation, route}) {
       })}>
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={DashBoard}
         initialParams={{loggedinDetails: loggedinDetails}}
       />
       <Tab.Screen

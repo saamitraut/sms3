@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import Icon1 from 'react-native-vector-icons/Feather';
 import DatePicker from 'react-native-date-picker';
 
-export default ({update, updatedon, getData}) => {
+export default ({update}) => {
   //   const [updatedon, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
 
@@ -18,14 +18,14 @@ export default ({update, updatedon, getData}) => {
       <DatePicker
         modal
         open={open}
-        date={updatedon}
+        date={new Date()}
         mode={'date'}
         onConfirm={date => {
           setOpen(false);
-          console.log(date);
+          // console.log(date);
           //   setDate(date);
           update(date);
-          getData();
+          // getData();
         }}
         onCancel={() => {
           setOpen(false);

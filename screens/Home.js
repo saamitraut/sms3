@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text} from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class Home extends Component {
@@ -13,30 +13,47 @@ class Home extends Component {
       loggedinDetails: loggedinDetails,
     };
   }
+  //
 
   componentDidMount() {
-    AsyncStorage.getItem('token')
-      .then(res => {
-        if (res != null) {
-          return JSON.parse(res);
-        } else {
-          this.props.navigation.navigate('Logout');
-        }
-      })
-      .then(data => {
-        // console.log(data);
-        // console.log('screens/loginscreen line 25');
-        // this.setState({loggedinDetails: data});
-      });
+    const {loggedinDetails} = this.props.route.params;
+    const {navigate} = this.props.navigation;
+    if (loggedinDetails == null) {
+      navigate('Login');
+    }
+    // AsyncStorage.getItem('token').then(res => {})
   }
 
   render() {
+    const {navigate} = this.props.navigation;
     return (
-      <View>
-        <Text>{JSON.stringify(this.state.loggedinDetails)}</Text>
+      <View style={styles.container}>
+        <View>
+          {/* <Text>{JSON.stringify(this.state.loggedinDetails)}</Text> */}
+          <Text style={styles.input}>Open Calls {5}</Text>
+          <Text style={styles.input}>Closed Calls {50}</Text>
+        </View>
       </View>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+  },
+
+  input: {
+    width: 300,
+    backgroundColor: '#B6BFC4',
+    borderRadius: 25,
+    padding: 16,
+    fontSize: 16,
+    marginVertical: 10,
+  },
+});
 
 export default Home;

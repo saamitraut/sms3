@@ -14,6 +14,7 @@ import {Picker} from '@react-native-picker/picker';
 
 class EditEmployeeModal extends Component {
   constructor(props) {
+    //
     super(props);
     this.state = {
       CallLogId: '',
@@ -25,18 +26,21 @@ class EditEmployeeModal extends Component {
       SubscriberName: '',
       complaintid: '',
       status: 0,
+      originalstatus: 0,
       subscriberid: '',
       loading: false,
       errorMessage: '',
       address: '',
       MobileNo: 0,
       showclear: false,
+      loggedinDetails: {},
     };
   }
-  //
 
   componentDidMount() {
-    // state value is updated by selected employee data    // console.log(this.props);
+    // state value is updated by selected employee data
+    // console.log('this.props screens/home/editemployeemodel');
+    // console.log(this.props);
     const {
       CallLogId,
       CalltypeId,
@@ -62,19 +66,21 @@ class EditEmployeeModal extends Component {
       SubscriberName: SubscriberName,
       complaintid: complaintid,
       status: status,
+      originalstatus: status,
       subscriberid: subscriberid,
       loading: false,
       errorMessage: '',
       address: address,
       Replyid: 0,
       Reply: '',
-      CreatedBy: 1,
-      //
+      CreatedBy: this.props.loggedinDetails.userid,
+      loggedinDetails: this.props.loggedinDetails,
       MobileNo: MobileNo,
-      OTP1: '',
+      OTP1: 'xxx',
       OTP: '',
     });
   }
+
   handleChange = (value, state) => {
     this.setState({[state]: value});
   };
@@ -99,7 +105,7 @@ class EditEmployeeModal extends Component {
     data.append('MobileNo', this.state.MobileNo);
     data.append('CallLogId', OTP1);
     data.append('SubscriberName', this.state.SubscriberName);
-    // console.log(data);
+    //  console.log(data);
     const InsertAPIURL = 'http://103.219.0.103/sla/call_verification.php';
     fetch(InsertAPIURL, {
       method: 'POST',
@@ -107,7 +113,7 @@ class EditEmployeeModal extends Component {
     })
       .then(res => res.json())
       .then(res => {
-        console.log(res);
+        // console.log(res);
         if ((res.Status = 'success')) {
           alert(res.Message);
         }
@@ -131,8 +137,8 @@ class EditEmployeeModal extends Component {
       this.state;
     this.setState({errorMessage: '', loading: true});
 
-    console.log('OTP IS ' + OTP);
-    console.log('OTP1 IS ' + OTP1);
+    // console.log('OTP IS ' + OTP);
+    // console.log('OTP1 IS ' + OTP1);
     if (OTP != OTP1) {
       alert('sorry confirmation otp does not match');
       return;
@@ -148,6 +154,8 @@ class EditEmployeeModal extends Component {
       data.append('status', status);
       data.append('CreatedBy', CreatedBy);
       data.append('Replyid', Replyid);
+      data.append('updatedby', this.state.loggedinDetails.userid);
+
       // alert(JSON.stringify(data));
       const updateAPIURL = 'http://103.219.0.103/sla/updateCallDetails.php';
 
@@ -157,7 +165,7 @@ class EditEmployeeModal extends Component {
       })
         .then(res => res.json())
         .then(res => {
-          console.log(res);
+          // console.log(res);
           if (res.status) {
             this.props.closeModal();
             this.props.updateEmployee(res.data);
@@ -176,6 +184,7 @@ class EditEmployeeModal extends Component {
       this.setState({errorMessage: 'Fields are empty.', loading: false});
     }
   };
+  //
 
   render() {
     const {isOpen, closeModal} = this.props;
@@ -189,6 +198,7 @@ class EditEmployeeModal extends Component {
       SubscriberName,
       complaintid,
       status,
+      originalstatus,
       subscriberid,
       loading,
       errorMessage,
@@ -196,8 +206,12 @@ class EditEmployeeModal extends Component {
       Replyid,
       Reply,
       MobileNo,
+      display,
+      loggedinDetails,
     } = this.state;
-    // console.log(this.state);
+    // console.log(loggedinDetails);
+    // console.log('loggedinDetails home/editemployeemodel line 212');
+
     return (
       <Modal
         propagateSwipe={true}
@@ -346,7 +360,8 @@ class EditEmployeeModal extends Component {
                 />
               </View>
             )}
-            <View style={{display: 'none'}}>
+
+            <View style={{display: originalstatus == 1 ? 'flex' : 'none'}}>
               <Text style={styles.title2}>Reply:</Text>
               <TextInput
                 defaultValue={Reply}
@@ -418,7 +433,7 @@ class EditEmployeeModal extends Component {
               <Text style={styles.message}>{errorMessage}</Text>
             ) : null}
             <View style={styles.buttonContainer}>
-              {this.state.status == 1 ? (
+              {originalstatus == 1 ? (
                 <TouchableOpacity
                   onPress={this.updateEmployee}
                   // onPress={() => alert('hello')}

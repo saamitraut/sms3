@@ -25,26 +25,21 @@ const formSchema = yup.object({
 });
 
 const LoginScreen = props => {
-  // console.log('props on LoginScreen Line 29');  console.log(props.navigation);
-  // console.log(props.route);
-  // Each scrren gets navigation prop and route prop
-  // const dispatch = useDispatch();
   const {navigation} = props;
-  // console.log(navigation);
   const isFocused = useIsFocused();
 
   const loadProfile = async () => {
     const token = await AsyncStorage.getItem('token');
-    // console.log('token on loginscreen line 34');console.log(token);
 
     if (token != null) {
-      props.navigation.navigate('Home', {loggedinDetails: JSON.parse(token)});
+      props.navigation.navigate('BottomTabNavigator', {
+        loggedinDetails: JSON.parse(token),
+      });
     }
   };
 
   useEffect(() => {
-    // logout();
-    // loadProfile();
+    loadProfile();
 
     if (isFocused) {
       // alert('hello');
@@ -66,6 +61,7 @@ const LoginScreen = props => {
           // console.log('submitted values on line 59');
           // console.log(values);
           // return;
+
           let loginAPIURL = 'http://103.219.0.103/api/check.php';
 
           let deviceId = DeviceInfo.getUniqueId();
