@@ -9,19 +9,19 @@ import {
   Linking,
 } from 'react-native';
 
-import AddEmployeeModal from './AddEmployeeModal';
+// import AddEmployeeModal from './AddEmployeeModal';
 import EditEmployeeModal from './EditEmployeeModal';
-import DeleteEmployeeModal from './deleteEmployeeModal';
+// import DeleteEmployeeModal from './deleteEmployeeModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Geolocation from 'react-native-geolocation-service'; //V IMP
 //import Geolocation from '@react-native-community/geolocation';
-import {PermissionsAndroid} from 'react-native';
+// import {PermissionsAndroid} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import DatePicker2 from '../../components/DatePicker2';
 import Icon1 from 'react-native-vector-icons/Feather';
 import Icon2 from 'react-native-vector-icons/MaterialIcons';
 import FlashMessage from 'react-native-flash-message';
-import {showMessage, hideMessage} from 'react-native-flash-message';
+// import {showMessage, hideMessage} from 'react-native-flash-message';
 import {
   requestLocationPermission,
   getOneTimeLocation,
@@ -142,7 +142,9 @@ class App extends Component {
       body: data,
     })
       .then(res => res.json())
-      .then(res => this.updateStateCalls(res.data))
+      .then(res => {
+        this.updateStateCalls(res.data);
+      })
       .catch(() => this.showError());
   };
 
@@ -460,6 +462,5 @@ const styles = StyleSheet.create({
     color: 'tomato',
     fontSize: 19,
   },
-  //
   row: {flex: 1, flexDirection: 'row', justifyContent: 'space-between'},
 });
