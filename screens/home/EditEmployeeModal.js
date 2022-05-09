@@ -16,7 +16,7 @@ import {Picker} from '@react-native-picker/picker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 import ImagePicker from 'react-native-image-crop-picker';
-
+import Icon1 from 'react-native-vector-icons/FontAwesome5';
 class EditEmployeeModal extends Component {
   constructor(props) {
     super(props);
@@ -38,7 +38,7 @@ class EditEmployeeModal extends Component {
       MobileNo: 0,
       showclear: false,
       loggedinDetails: {},
-      uri: 'https://www.prameyanews.com/wp-content/uploads/2022/03/rashmikamandanna.webp',
+      uri: 'https://cdn1.vectorstock.com/i/1000x1000/56/05/inventory-checkboard-icon-flat-style-vector-29615605.jpg',
       uri2: '',
       imagedetails: '',
     };
@@ -234,53 +234,14 @@ class EditEmployeeModal extends Component {
         animationType="slide">
         <ScrollView>
           <View>
-            <Text>Let's Learn image upload!</Text>
-            <Image source={{uri: uri}} style={{width: 300, height: 300}} />
-            <Text>{this.state.imagedetails}</Text>
-            <Button
-              onPress={() => {
-                ImagePicker.openCamera({
-                  width: 300,
-                  height: 300,
-                  cropping: true,
-                })
-                  .then(image => {
-                    // console.log(image);
-                    this.setState(
-                      {uri: image.path, uri2: image.modificationDate},
-                      () => {
-                        this.setState({imagedetails: JSON.stringify(image)});
+            {/* <Text>Let's Learn image upload!</Text> */}
 
-                        const InsertAPIURL =
-                          'http://103.219.0.103/api/imageupload.php';
-                        var data = new FormData();
-                        data.append('path', {
-                          uri: image.path,
-                          type: image.mime,
-                          name: image.modificationDate + '.jpg',
-                        });
-
-                        fetch(InsertAPIURL, {
-                          method: 'POST',
-                          body: data,
-                          headers: {
-                            'Content-Type': 'multipart/form-data',
-                          },
-                        })
-                          .then(res => res.json())
-                          .then(res => console.log(res))
-                          .catch(() => this.showError());
-                      },
-                    );
-                  })
-                  .catch(e => {
-                    console.log(e);
-                  });
-              }}
+            {/* <Text>{this.state.imagedetails}</Text> */}
+            {/* <Button
               title="Photo"
               color="grey"
               accessibilityLabel="Learn more about this purple button"
-            />
+            /> */}
           </View>
 
           <View style={[styles.container]}>
@@ -490,6 +451,49 @@ class EditEmployeeModal extends Component {
                 style={styles.button}>
                 <Text style={styles.buttonText}>CONFIRMATION OTP</Text>
               </TouchableOpacity>
+              <Image source={{uri: uri}} style={{width: 100, height: 100}} />
+              <Icon1
+                onPress={() => {
+                  ImagePicker.openCamera({
+                    width: 300,
+                    height: 300,
+                    cropping: true,
+                  })
+                    .then(image => {
+                      // console.log(image);
+                      this.setState(
+                        {uri: image.path, uri2: image.modificationDate},
+                        () => {
+                          this.setState({imagedetails: JSON.stringify(image)});
+
+                          const InsertAPIURL =
+                            'http://103.219.0.103/api/imageupload.php';
+                          var data = new FormData();
+                          data.append('path', {
+                            uri: image.path,
+                            type: image.mime,
+                            name: image.modificationDate + '.jpg',
+                          });
+
+                          fetch(InsertAPIURL, {
+                            method: 'POST',
+                            body: data,
+                            headers: {
+                              'Content-Type': 'multipart/form-data',
+                            },
+                          })
+                            .then(res => res.json())
+                            .then(res => console.log(res))
+                            .catch(() => this.showError());
+                        },
+                      );
+                    })
+                    .catch(e => {
+                      console.log(e);
+                    });
+                }}
+                style={styles.buttonText2}
+                name="camera-retro"></Icon1>
             </View>
             {loading ? (
               <Text style={styles.message}>Please Wait...</Text>
@@ -566,6 +570,12 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 10,
     fontSize: 16,
+  },
+  buttonText2: {
+    color: 'black',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    fontSize: 36,
   },
   message: {
     color: 'tomato',
