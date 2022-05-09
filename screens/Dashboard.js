@@ -17,13 +17,15 @@ class Home2 extends Component {
     //
     // console.log('props on line 25 scrreens/Home.js');
     const {loggedinDetails} = props.route.params;
+    // console.log(loggedinDetails);
     this.state = {
       count: 0,
       loggedinDetails: loggedinDetails,
     };
   }
+
   navigate = this.props.navigation.navigate;
-  //   image = {uri: 'https://reactjs.org/logo-og.png'};
+
   data = [
     {
       name: ' Open Calls',
@@ -39,9 +41,8 @@ class Home2 extends Component {
           }}
         />
       ),
+
       nameColor: '#6699cc',
-      // iconColor: '#0d47a1',
-      // rippleColor: '#000',
     },
     {
       name: 'Closed Calls',
@@ -58,31 +59,7 @@ class Home2 extends Component {
         />
       ),
       nameColor: '#6699cc',
-      // iconColor: '#0d47a1',
-      // rippleColor: '#000',
     },
-    // {
-    //   name: 'Lovely',
-    //   background: '#ffeb3b',
-    //   // icon: (item, background) => Icon({icon: 'heart', item, background}),
-    // },
-    // {
-    //   name: 'Team',
-    //   background: '#4caf50',
-    //   // icon: (item, background) => Icon({icon: 'users', item, background}),
-    //   styleName: {color: '#0d47a1', fontWeight: 'bold'},
-    // },
-    // {
-    //   name: 'Friends',
-    //   nameColor: '#3498db',
-    //   background: '#02cbef',
-    //   // icon: (item, background) => Icon({icon: 'group', item, background}),
-    // },
-    // {
-    //   name: 'Calendars',
-    //   background: '#ff5722',
-    //   // icon: (item, background) => Icon({icon: 'calendar', item, background}),
-    // },
   ];
 
   getData = () => {
