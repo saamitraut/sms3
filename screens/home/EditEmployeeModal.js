@@ -9,12 +9,15 @@ import {
   ScrollView,
   Button,
   Replyid,
+  Platform,
+  Image,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import ImagePicker from 'react-native-image-crop-picker';
 
 class EditEmployeeModal extends Component {
   constructor(props) {
-    //
     super(props);
     this.state = {
       CallLogId: '',
@@ -38,6 +41,7 @@ class EditEmployeeModal extends Component {
   }
 
   componentDidMount() {
+    // this.requestCameraPermission();
     // state value is updated by selected employee data
     // console.log('this.props screens/home/editemployeemodel');
     // console.log(this.props);
@@ -78,6 +82,8 @@ class EditEmployeeModal extends Component {
       MobileNo: MobileNo,
       OTP1: 'xxx',
       OTP: '',
+      uri: 'https://www.prameyanews.com/wp-content/uploads/2022/03/rashmikamandanna.webp',
+      imagedetails: '',
     });
   }
 
@@ -208,6 +214,7 @@ class EditEmployeeModal extends Component {
       MobileNo,
       display,
       loggedinDetails,
+      uri,
     } = this.state;
     // console.log(loggedinDetails);
     // console.log('loggedinDetails home/editemployeemodel line 212');
@@ -219,6 +226,52 @@ class EditEmployeeModal extends Component {
         onRequestClose={closeModal}
         animationType="slide">
         <ScrollView>
+          <View>
+            <Text>Let's Learn image upload!</Text>
+            <Image source={{uri: uri}} style={{width: 300, height: 300}} />
+            <Text>{this.state.imagedetails}</Text>
+            <Button
+              onPress={() => {
+                ImagePicker.openCamera({
+                  width: 300,
+                  height: 300,
+                  cropping: true,
+                })
+                  .then(image => {
+                    // console.log(image);
+                    this.setState({uri: image.path}, () => {
+                      this.setState({imagedetails: JSON.stringify(image)});
+                      const InsertAPIURL =
+                        'http://103.219.0.103/api/imageupload.php';
+                      var data = new FormData();
+                      data.append('path', {
+                        uri: image.path,
+                        type: image.mime,
+                        name: image.modificationDate + '.jpg',
+                      });
+                      fetch(InsertAPIURL, {
+                        method: 'POST',
+                        //
+                        body: data,
+                        headers: {
+                          'Content-Type': 'multipart/form-data',
+                        },
+                      })
+                        .then(res => res.json())
+                        .then(res => console.log(res))
+                        .catch(() => this.showError());
+                    });
+                  })
+                  .catch(e => {
+                    console.log(e);
+                  });
+              }}
+              title="Photo"
+              color="grey"
+              accessibilityLabel="Learn more about this purple button"
+            />
+          </View>
+
           <View style={[styles.container]}>
             <Text style={styles.title}>
               Update Call{' '}
@@ -461,6 +514,7 @@ class EditEmployeeModal extends Component {
     );
   }
 }
+
 export default EditEmployeeModal;
 
 const styles = StyleSheet.create({
@@ -504,7 +558,7 @@ const styles = StyleSheet.create({
   },
   message: {
     color: 'tomato',
-    fontSize: 17,
+    fontSize: 16,
   },
   title2: {
     fontWeight: 'bold',
