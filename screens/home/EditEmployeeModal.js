@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+
 import ImagePicker from 'react-native-image-crop-picker';
 
 class EditEmployeeModal extends Component {
@@ -37,6 +38,9 @@ class EditEmployeeModal extends Component {
       MobileNo: 0,
       showclear: false,
       loggedinDetails: {},
+      uri: 'https://www.prameyanews.com/wp-content/uploads/2022/03/rashmikamandanna.webp',
+      uri2: '',
+      imagedetails: '',
     };
   }
 
@@ -82,8 +86,6 @@ class EditEmployeeModal extends Component {
       MobileNo: MobileNo,
       OTP1: 'xxx',
       OTP: '',
-      uri: 'https://www.prameyanews.com/wp-content/uploads/2022/03/rashmikamandanna.webp',
-      imagedetails: '',
     });
   }
 
@@ -93,9 +95,10 @@ class EditEmployeeModal extends Component {
 
   makeid(length) {
     var characters = '0123456789';
+    //
     var result = '';
-
     var charactersLength = characters.length;
+
     for (var i = 0; i < length; i++) {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
@@ -145,24 +148,27 @@ class EditEmployeeModal extends Component {
 
     // console.log('OTP IS ' + OTP);
     // console.log('OTP1 IS ' + OTP1);
-    if (OTP != OTP1) {
-      alert('sorry confirmation otp does not match');
-      return;
-    }
+    // if (OTP != OTP1) {
+    //   alert('sorry confirmation otp does not match');
+    //   return;
+    // }
 
     if (complaintid && Reply != '' && CreatedBy && Replyid != '') {
       // selected employee is updated with employee id
       //
 
       var data = new FormData();
+
       data.append('complaintid', complaintid);
       data.append('Reply', Reply);
       data.append('status', status);
       data.append('CreatedBy', CreatedBy);
       data.append('Replyid', Replyid);
       data.append('updatedby', this.state.loggedinDetails.userid);
+      data.append('uri2', this.state.uri2);
 
       // alert(JSON.stringify(data));
+      // console.log(data);
       const updateAPIURL = 'http://103.219.0.103/sla/updateCallDetails.php';
 
       fetch(updateAPIURL, {
@@ -172,6 +178,7 @@ class EditEmployeeModal extends Component {
         .then(res => res.json())
         .then(res => {
           // console.log(res);
+          // return;
           if (res.status) {
             this.props.closeModal();
             this.props.updateEmployee(res.data);
@@ -239,28 +246,32 @@ class EditEmployeeModal extends Component {
                 })
                   .then(image => {
                     // console.log(image);
-                    this.setState({uri: image.path}, () => {
-                      this.setState({imagedetails: JSON.stringify(image)});
-                      const InsertAPIURL =
-                        'http://103.219.0.103/api/imageupload.php';
-                      var data = new FormData();
-                      data.append('path', {
-                        uri: image.path,
-                        type: image.mime,
-                        name: image.modificationDate + '.jpg',
-                      });
-                      fetch(InsertAPIURL, {
-                        method: 'POST',
-                        //
-                        body: data,
-                        headers: {
-                          'Content-Type': 'multipart/form-data',
-                        },
-                      })
-                        .then(res => res.json())
-                        .then(res => console.log(res))
-                        .catch(() => this.showError());
-                    });
+                    this.setState(
+                      {uri: image.path, uri2: image.modificationDate},
+                      () => {
+                        this.setState({imagedetails: JSON.stringify(image)});
+
+                        const InsertAPIURL =
+                          'http://103.219.0.103/api/imageupload.php';
+                        var data = new FormData();
+                        data.append('path', {
+                          uri: image.path,
+                          type: image.mime,
+                          name: image.modificationDate + '.jpg',
+                        });
+
+                        fetch(InsertAPIURL, {
+                          method: 'POST',
+                          body: data,
+                          headers: {
+                            'Content-Type': 'multipart/form-data',
+                          },
+                        })
+                          .then(res => res.json())
+                          .then(res => console.log(res))
+                          .catch(() => this.showError());
+                      },
+                    );
                   })
                   .catch(e => {
                     console.log(e);
